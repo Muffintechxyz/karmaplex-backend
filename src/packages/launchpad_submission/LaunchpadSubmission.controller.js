@@ -122,9 +122,12 @@ const getSubmissions = async (req, res) => {
           id: submission.id,
           creator_public_key: submission.creator_public_key,
           collection_name: submission.collection_name,
+          collection_image_url: submission.collection_image_url,
+          collection_banner_url: submission.collection_banner_url,
           approval_status: submission.approval_status,
           exp_mint_date: submission.exp_mint_date,
           featured: submission.featured,
+          mint_price: submission.mint_price,
           actions: {
             address: submission.creator_public_key,
             status: submission.approval_status
