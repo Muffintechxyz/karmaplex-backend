@@ -297,6 +297,46 @@ const findDuplicate = async (collectionName) => {
   }
 }
 
+const getCollectionHeaderInfo = async (req, res) => {
+  try {
+    // const { creatorId, collectionName } = req.body
+    const creatorId = req.params.creatorId
+    const collectionName = req.params.collectionName
+
+    const collectionHeaderInfo = await LaunchpadSubmission.findOne({
+      where: { creator_public_key: creatorId, collection_name: collectionName },
+      attributes: ['id', 'collection_name', 'project_description', 'creator_public_key', 'collection_image_url', 'collection_banner_url']
+    })
+
+    if (collectionHeaderInfo) {
+      return res.status(200).json(collectionHeaderInfo)
+    } else {
+      return res.status(200).json(null)
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message, datetime: new Date() })
+  }
+}
+
+const getSubmission = async (req, res) => {
+  try {
+    const creatorId = req.params.id
+    const collectionName = req.params.name
+
+    const submission = await LaunchpadSubmission.findOne({
+      where: { creator_public_key: creatorId, collection_name: collectionName },
+    })
+
+    if (submission) {
+      return res.status(200).json(submission)
+    } else {
+      return res.status(200).json(null)
+    }
+  } catch (error) {
+    res.status(400).json({ message: error.message, datetime: new Date() })
+  }
+}
+
 module.exports = {
   addSubmission,
   getSubmissions,
@@ -305,4 +345,6 @@ module.exports = {
   findByMint,
   makrAsFeatured,
   getFeaturedSubmission,
+  getCollectionHeaderInfo,
+  getSubmission,
 }
