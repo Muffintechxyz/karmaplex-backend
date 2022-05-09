@@ -23,6 +23,12 @@ module.exports = () => {
   router.get('/launchpad-submission/submission/:id/:name', controller.getSubmission)
   router.put('/launchpad-submission/', controller.statusToApprove)
   router.put('/launchpad-submission/mark-featured/:id', controller.makrAsFeatured)
+  router.put('/launchpad-submission/update/:id', upload.fields(
+    [
+      { name: 'collection_image', maxCount: 1 }, 
+      { name: 'collection_banner', maxCount: 1 }
+    ]
+  ), controller.updateSubmission)
 
   return router
 }

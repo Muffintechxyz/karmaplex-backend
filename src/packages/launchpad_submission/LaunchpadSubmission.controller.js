@@ -111,6 +111,116 @@ const addSubmission = async (req, res) => {
   }
 }
 
+const updateSubmission = async (req, res) => {
+  try {
+    const userData = JSON.parse(req.body.userDetails)
+    const submissionId = req.params.id
+
+    const submission = await LaunchpadSubmission.findOne({
+      where: {id: submissionId}
+    })
+
+    if (!submission) {
+      throw new Error("Submission information are not found")
+    }
+
+    console.log(req.files.collection_banner)
+    let collectionImageURL;
+    let collectionBannerURL;
+    const collectionImage = 'collection_images'
+    const collectionBanner = 'collection_banners'
+
+    // Upload collection image
+    if (req.files.collection_image) {
+      collectionImageURL = await new Promise((resolve, reject) => {
+        let key = new Date().getTime() + "_" + Math.floor(Math.random() * 1000000 + 1) + ".jpeg";
+        s3.putObject({
+          Bucket: Config.S3_BUCKET_NAME + '/' + collectionImage,
+          ContentType: "image/jpeg",
+          Key: key,
+          Body: req.files.collection_image[0].buffer
+        }, (err, _data) => {
+          if (err) {
+            return reject(err.message)
+          }
+          const imageURL = Config.S3_BUCKET_URL + '/' + collectionImage + '/' + key
+          return resolve(imageURL)
+        })
+      })
+    } else {
+      collectionImageURL = submission.collection_image_url
+    }
+
+    // Upload collection banner image
+    if (req.files.collection_banner) {
+      collectionBannerURL = await new Promise((resolve, reject) => {
+        let key = new Date().getTime() + "_" + Math.floor(Math.random() * 1000000 + 1) + ".jpeg";
+        s3.putObject({
+          Bucket: Config.S3_BUCKET_NAME + '/' + collectionBanner,
+          ContentType: "image/jpeg",
+          Key: key,
+          Body: req.files.collection_banner[0].buffer
+        }, (err, _data) => {
+          if (err) {
+            return reject(err.message)
+          }
+          const imageURL = Config.S3_BUCKET_URL + '/' + collectionBanner + '/' + key
+          return resolve(imageURL)
+        })
+      })
+    } else {
+      collectionBannerURL = submission.collection_banner_url
+    }
+
+    let modifiedCollectionName;
+
+    if (userData.collection_name && /\s/g.test(userData.collection_name)) {
+      modifiedCollectionName = userData.collection_name.replace(/\s/g, '%')
+    } else {
+      modifiedCollectionName = userData.collection_name
+    }
+
+    const submissionDoc = {
+      collection_name: userData.collection_name,
+      collection_name_query_string: modifiedCollectionName,
+      creator_name: userData.creator_name,
+      creator_public_key: userData.creator_public_key,
+      current_stage: userData.current_stage,
+      is_legal: userData.is_legal,
+      is_derivative: userData.is_derivative,
+      discord_id: userData.discord_id,
+      email: userData.email,
+      project_description: userData.project_description,
+      long_trm_goals: userData.long_trm_goals,
+      team_description: userData.team_description,
+      experience: userData.experience,
+      twitter_link: userData.twitter_link,
+      discord_server: userData.discord_server,
+      instagram_link: userData.instagram_link,
+      linked_in_profile: userData.linked_in_profile,
+      website_link: userData.website_link,
+      other_link: userData.other_link,
+      exp_mint_date: userData.exp_mint_date,
+      exp_item_count: userData.exp_item_count,
+      is_team_dox: userData.is_team_dox,
+      mint_price: userData.mint_price,
+      marketing_package: userData.marketing_package,
+      other: userData.other,
+      categories: userData.categories,
+      collection_image_url: collectionImageURL,
+      collection_banner_url: collectionBannerURL,
+    }
+
+    const modifiedSubmission = await LaunchpadSubmission.update(submissionDoc, {
+      where: { id: submissionId }
+    })
+
+    res.status(200).json({ data: modifiedSubmission, datetime: new Date(), isSuccess: true })
+  } catch (error) {
+    res.status(400).json({ message: error.message, datetime: new Date(), isSuccess: false })
+  }
+}
+
 const getSubmissions = async (req, res) => {
   try {
     const submissions = await LaunchpadSubmission.findAll()
@@ -347,4 +457,5 @@ module.exports = {
   getFeaturedSubmission,
   getCollectionHeaderInfo,
   getSubmission,
+  updateSubmission
 }
