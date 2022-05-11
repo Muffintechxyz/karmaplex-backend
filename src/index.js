@@ -3,8 +3,8 @@ const express = require('express')
 const cors = require('cors')
 const moment = require('moment')
 const database = require('./utils/DBConnection')
-const nftDetails = require('./packages/nft_details')
-const launchpadSubmission = require('./packages/launchpad_submission')
+const { launchpad_submission, nft_details, profile } = require('./packages')
+
 
 const main = () => {
   const app = express()
@@ -16,13 +16,14 @@ const main = () => {
     req.db = database
     next()
   })
-  app.use(nftDetails())
-  app.use(launchpadSubmission())
+  app.use(nft_details())
+  app.use(launchpad_submission())
+  app.use(profile())
 
   app.get('/', (req, res) => {
     res.send(`
       <div style="display: flex; justify-content: center;">
-        <h2 style="margin: 0px;">Karmaplex Backend API v1.0.3</h2>
+        <h2 style="margin: 0px;">Karmaplex Backend API v1.0.4</h2>
       </div>
       <div style="display: flex; justify-content: center;">
         <h3 style="margin: 0px;">${moment(new Date()).format('LLLL')}<//h3>

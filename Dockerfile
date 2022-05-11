@@ -17,6 +17,5 @@ COPY . /nft-details-server
 FROM node:14.18-alpine
 WORKDIR /app
 COPY --from=BASE_IMAGE /nft-details-server /app/
-ENV DB_CONN_STRING mongodb+srv://salesadmin:admin@sales-api-db-cluster.kwbdo.mongodb.net/nftdetailsdb?retryWrites=true&w=majority
 EXPOSE 9000
 CMD [ "npm", "run", "start" ]
