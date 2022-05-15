@@ -23,7 +23,7 @@ const main = () => {
   app.get('/', (req, res) => {
     res.send(`
       <div style="display: flex; justify-content: center;">
-        <h2 style="margin: 0px;">Karmaplex Backend API v1.0.4</h2>
+        <h2 style="margin: 0px;">Karmaplex Backend API v1.0.5</h2>
       </div>
       <div style="display: flex; justify-content: center;">
         <h3 style="margin: 0px;">${moment(new Date()).format('LLLL')}<//h3>
