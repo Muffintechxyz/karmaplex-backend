@@ -41,7 +41,7 @@ const addProfileInfo = async (req, res) => {
         })
       })
     } else {
-      image_url = profile.image
+      image_url = profile && profile.image ? profile.image : null
     }
 
     let modfiedProfileInfo = {
@@ -84,10 +84,10 @@ const getProfile = async (req, res) => {
     })
 
     if (!profile) {
-      throw new Error('Profile not found')
+      return res.status(200).json({ data: profile, datetime: new Date(), isSuccess: true })
     }
 
-    res.status(200).json({ data: profile, datetime: new Date(), isSuccess: true })
+    return res.status(200).json({ data: profile, datetime: new Date(), isSuccess: true })
   } catch (error) {
     res.status(400).json({ message: error.message, datetime: new Date(), isSuccess: false })
   }
