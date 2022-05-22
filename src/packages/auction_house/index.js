@@ -3,9 +3,9 @@ const controller = require('./AuctionHouse.controller')
 const router = express.Router()
 
 module.exports = () => {
-  router.post('/create', controller.createAuctionHouse)
-  router.get('/get/:id', controller.getAuctionHouse)
-  router.get('/get', controller.getAuctionHouse)
+  router.post('/ah/create', controller.createAuctionHouse)
+  router.get('/ah/get/:id', controller.getAuctionHouse)
+  router.get('/ah/get', controller.getAuctionHouse)
 
   return router
 }
