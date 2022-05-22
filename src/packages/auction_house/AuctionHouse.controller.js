@@ -43,21 +43,21 @@ const createAuctionHouse = async (req, res) => {
 
 const getAuctionHouse = async (req, res) => {
     try {
-        let auctioHouse;
+        let auctionHouse;
         if (req.params.id) {
-            auctioHouse = await AuctionHouse.findAll({
+            auctionHouse = await AuctionHouse.findAll({
                 where: { mint: req.params.id }
               })
         }
         else
         {
-            auctioHouse = await AuctionHouse.findAll()
+            auctionHouse = await AuctionHouse.findAll()
         }
 
-        if (auctioHouse && auctioHouse.length > 0) {
-          return res.status(201).json(auctioHouse)
+        if (auctionHouse && auctionHouse.length > 0) {
+          return res.status(201).json(auctionHouse)
         } else {
-          throw new Error(`Details are not found for auctioHouse key: ${req.params.id}`)
+          throw new Error(`Details are not found for auctionHouse key: ${req.params.id}`)
         }
       } catch (error) {
         return res
