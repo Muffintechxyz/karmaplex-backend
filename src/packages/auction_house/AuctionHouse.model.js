@@ -9,6 +9,7 @@ const AuctionHouse = sequelize.define('auction_house', {
   creator_wallet: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
   requires_sign_off: { type: DataTypes.BOOLEAN, allowNull: true, defaultValue: false },
   mint: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
+  network: {type: DataTypes.STRING, allowNull: true, defaultValue: "dev"}
 }, {
   paranoid: true,
   timestamps: true
