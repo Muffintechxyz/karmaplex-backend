@@ -3,7 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const moment = require('moment')
 const database = require('./utils/DBConnection')
-const { launchpad_submission, nft_details, profile, auctionHouse } = require('./packages')
+const { launchpad_submission, nft_details, profile, auctionHouse, tags } = require('./packages')
 
 
 const main = () => {
@@ -20,6 +20,7 @@ const main = () => {
   app.use(launchpad_submission())
   app.use(profile())
   app.use(auctionHouse())
+  app.use(tags())
 
   app.get('/', (req, res) => {
     res.send(`
