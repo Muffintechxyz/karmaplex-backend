@@ -7,8 +7,10 @@ const AhNFTSale = sequelize.define('ah_nft_sale', {
   auction_house_wallet: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
   seller_wallet: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
   sale_price:{ type: DataTypes.FLOAT, allowNull: true, defaultValue: 0.0 },
-  end_date: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
-  network: {type: DataTypes.STRING, allowNull: true, defaultValue: "dev"}
+  end_date: { type: DataTypes.DATE, allowNull: true, defaultValue: null },
+  network: {type: DataTypes.STRING, allowNull: true, defaultValue: "dev"},
+  active: { type: DataTypes.BOOLEAN, allowNull: true, defaultValue: false },
+  collection: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
 }, {
   paranoid: true,
   timestamps: true
