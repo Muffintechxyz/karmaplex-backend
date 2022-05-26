@@ -1,5 +1,5 @@
 const express = require('express')
-const controller = require('./ahNFTOffers.controller')
+const controller = require('./ahNFToffers.controller')
 const router = express.Router()
 
 module.exports = () => {
