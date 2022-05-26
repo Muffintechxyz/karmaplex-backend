@@ -3,9 +3,9 @@ const controller = require('./ahNFTSale.controller')
 const router = express.Router()
 
 module.exports = () => {
-  router.post('/nft/list', controller.listNFTforSale)
-  router.get('/net/get/:id', controller.getNFTforSale)
-  router.get('/net/get', controller.getNFTforSale)
+  router.post('/nft/listing', controller.listNFTforSale)
+  router.get('/nft/listing/:id', controller.getNFTforSale)
+  router.get('/nft/listing', controller.getNFTforSale)
 
   return router
 }

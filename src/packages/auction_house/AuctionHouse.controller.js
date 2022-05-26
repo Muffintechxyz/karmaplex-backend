@@ -46,7 +46,7 @@ const getAuctionHouse = async (req, res) => {
         let auctionHouse;
         if (req.params.id) {
             auctionHouse = await AuctionHouse.findAll({
-                where: { mint: req.params.id }
+                where: { creator_wallet: req.params.id }
               })
         }
         else
