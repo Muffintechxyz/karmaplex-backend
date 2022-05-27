@@ -68,7 +68,38 @@ const getNFTforSale = async (req, res) => {
       }
 }
 
+const getNFTforSaleByCollection = async (req, res) => {
+  try {
+      let NFTforSale;
+      var seller = req.query?.seller;
+      if (req.params.id) {
+          NFTforSale = await AhNFTSale.findAll({
+              where: { collection: req.params.id }
+            })
+      }
+      else
+      {
+          NFTforSale = await AhNFTSale.findAll(
+            {                
+              where: { ...(!!seller && {seller_wallet: seller})
+          }
+        })
+      }
+
+      if (NFTforSale && NFTforSale.length > 0) {
+        return res.status(201).json(NFTforSale)
+      } else {
+        throw new Error(`Details are not found for NFT mint key: ${req.params.id}`)
+      }
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: error.message, dateTime: new Date() })
+    }
+}
+
 module.exports = {
     listNFTforSale,
     getNFTforSale,
+    getNFTforSaleByCollection
   }
