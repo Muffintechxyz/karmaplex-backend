@@ -14,6 +14,9 @@ const AhNFTSale = sequelize.define('ah_nft_sale', {
   tnx_sol_amount: { type: DataTypes.FLOAT, allowNull: true, defaultValue: 0.0 },
   tnx_usd_amount:  { type: DataTypes.FLOAT, allowNull: true, defaultValue: 0.0 },
   offer_id: { type: DataTypes.STRING, allowNull: true },
+  metadata: { type: DataTypes.JSON, allowNull: true},
+  nft_name:  { type: DataTypes.STRING, allowNull: true, defaultValue: null },
+  url:  { type: DataTypes.STRING, allowNull: true, defaultValue: null }
 }, {
   paranoid: true,
   timestamps: true
