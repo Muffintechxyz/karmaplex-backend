@@ -15,7 +15,10 @@ const makeOffer = async (req, res) => {
             offer_price,
             network,
             active,
-            collection
+            collection,
+            metadata,
+            nft_name,
+            url
           } = req.body
           const nftOffer = await AhNFTOffers.create({
             id: uuidv4(),
@@ -26,7 +29,10 @@ const makeOffer = async (req, res) => {
             offer_price,
             network,
             active,
-            collection
+            collection,
+            metadata,
+            nft_name,
+            url
           })
 
           if (nftOffer) {
