@@ -13,7 +13,7 @@ const listNFTforSale = async (req, res) => {
             sale_price,
             end_date,
             network,
-            collection
+            collection,
           } = req.body
           const nftSale = await AhNFTSale.create({
             id: uuidv4(),
@@ -41,6 +41,45 @@ const listNFTforSale = async (req, res) => {
         .json({ message: error.message, dateTime: new Date() })
     }
 }
+
+
+const addASaleEvent = async (req, res) => { 
+  try {
+      const {
+        tnx_sol_amount,
+        tnx_usd_amount,
+        offer_id
+        } = req.body
+
+        const nft = await AhNFTSale.findOne({
+          where: { id: req.params.id}
+        })
+
+        nft.set({
+          tnx_sol_amount,
+          tnx_usd_amount,
+          offer_id
+        })
+
+        await nft.save()
+
+        if (nft) {
+          console.log(
+            'nftSale record created',
+            moment(new Date()).format('lll')
+          )
+          return res.status(201).json(nft)
+        } else {
+          throw new Error('Error with updating a nftSale record')
+        }
+  } catch (error) {
+      return res
+      .status(500)
+      .json({ message: error.message, dateTime: new Date() })
+  }
+}
+
+
 
 
 const getNFTforSale = async (req, res) => {
@@ -101,5 +140,6 @@ const getNFTforSaleByCollection = async (req, res) => {
 module.exports = {
     listNFTforSale,
     getNFTforSale,
-    getNFTforSaleByCollection
+    getNFTforSaleByCollection,
+    addASaleEvent
   }

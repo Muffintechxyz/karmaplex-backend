@@ -21,4 +21,10 @@ const AhNFTOffers = sequelize.define('ah_nft_offers', {
   timestamps: true
 })
 
+
+// Will be adding an audit log
+// AhNFTOffers.addHook('afterCreate', () => {
+
+// })
+
 module.exports = AhNFTOffers
