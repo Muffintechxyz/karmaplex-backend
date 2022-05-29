@@ -14,6 +14,9 @@ const listNFTforSale = async (req, res) => {
             end_date,
             network,
             collection,
+            metadata, 
+            nft_name,
+            url
           } = req.body
           const nftSale = await AhNFTSale.create({
             id: uuidv4(),
@@ -23,7 +26,10 @@ const listNFTforSale = async (req, res) => {
             sale_price,
             end_date,
             network,
-            collection
+            collection,
+            metadata, 
+            nft_name,
+            url
           })
 
           if (nftSale) {
