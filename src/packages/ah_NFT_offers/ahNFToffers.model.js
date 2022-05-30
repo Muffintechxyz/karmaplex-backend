@@ -12,9 +12,19 @@ const AhNFTOffers = sequelize.define('ah_nft_offers', {
   network: {type: DataTypes.STRING, allowNull: true, defaultValue: "dev"},
   active: { type: DataTypes.BOOLEAN, allowNull: true, defaultValue: false },
   collection: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
+  metadata: { type: DataTypes.JSON, allowNull: true},
+  nft_name:  { type: DataTypes.STRING, allowNull: true, defaultValue: null },
+  url:  { type: DataTypes.STRING, allowNull: true, defaultValue: null }
+
 }, {
   paranoid: true,
   timestamps: true
 })
+
+
+// Will be adding an audit log
+// AhNFTOffers.addHook('afterCreate', () => {
+
+// })
 
 module.exports = AhNFTOffers

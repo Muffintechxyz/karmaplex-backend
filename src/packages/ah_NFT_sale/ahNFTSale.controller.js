@@ -13,7 +13,10 @@ const listNFTforSale = async (req, res) => {
             sale_price,
             end_date,
             network,
-            collection
+            collection,
+            metadata, 
+            nft_name,
+            url
           } = req.body
           const nftSale = await AhNFTSale.create({
             id: uuidv4(),
@@ -23,7 +26,10 @@ const listNFTforSale = async (req, res) => {
             sale_price,
             end_date,
             network,
-            collection
+            collection,
+            metadata, 
+            nft_name,
+            url
           })
 
           if (nftSale) {
@@ -41,6 +47,45 @@ const listNFTforSale = async (req, res) => {
         .json({ message: error.message, dateTime: new Date() })
     }
 }
+
+
+const addASaleEvent = async (req, res) => { 
+  try {
+      const {
+        tnx_sol_amount,
+        tnx_usd_amount,
+        offer_id
+        } = req.body
+
+        const nft = await AhNFTSale.findOne({
+          where: { id: req.params.id}
+        })
+
+        nft.set({
+          tnx_sol_amount,
+          tnx_usd_amount,
+          offer_id
+        })
+
+        await nft.save()
+
+        if (nft) {
+          console.log(
+            'nftSale record created',
+            moment(new Date()).format('lll')
+          )
+          return res.status(201).json(nft)
+        } else {
+          throw new Error('Error with updating a nftSale record')
+        }
+  } catch (error) {
+      return res
+      .status(500)
+      .json({ message: error.message, dateTime: new Date() })
+  }
+}
+
+
 
 
 const getNFTforSale = async (req, res) => {
@@ -68,7 +113,39 @@ const getNFTforSale = async (req, res) => {
       }
 }
 
+const getNFTforSaleByCollection = async (req, res) => {
+  try {
+      let NFTforSale;
+      var seller = req.query?.seller;
+      if (req.params.id) {
+          NFTforSale = await AhNFTSale.findAll({
+              where: { collection: req.params.id }
+            })
+      }
+      else
+      {
+          NFTforSale = await AhNFTSale.findAll(
+            {                
+              where: { ...(!!seller && {seller_wallet: seller})
+          }
+        })
+      }
+
+      if (NFTforSale && NFTforSale.length > 0) {
+        return res.status(201).json(NFTforSale)
+      } else {
+        throw new Error(`Details are not found for NFT mint key: ${req.params.id}`)
+      }
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: error.message, dateTime: new Date() })
+    }
+}
+
 module.exports = {
     listNFTforSale,
     getNFTforSale,
+    getNFTforSaleByCollection,
+    addASaleEvent
   }
