@@ -74,9 +74,6 @@ const getStatistics = async (req, res) => {
     let startDate = moment().startOf('week').add(1, "day").format("YYYY-MM-DD");
     let endDate = moment().endOf('week').add(1, "day").format("YYYY-MM-DD");
 
-    console.log("--start--", startDate);
-    console.log("--end--", endDate);
-
     let nftStatistics = await NFTDetails.findAll({
       attributes: ['datetime',[Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'total_cost']],
       where: { 
@@ -115,7 +112,7 @@ const getStatistics = async (req, res) => {
 
     console.log(nftStatistics)
 
-    if (nftStatistics && nftStatistics.length > 0) {
+    if (nftStatistics) {
 
       let days7 = [];
       let nextInLine = "Monday";
@@ -182,10 +179,15 @@ const getStatistics = async (req, res) => {
 
       }
 
+      let nftSales = {
+        total_sol: nftTotalSales !== null ? nftTotalSales.total_sol != null ? nftTotalSales.total_sol : 0 : 0,
+        total_usd: nftTotalSales ? nftTotalSales.total_usd != null ? nftTotalSales.total_usd : 0 : 0
+      }
+
       return res.status(200).json({
         days7,
-        nftTotalSales,
-        nftActivities
+        nftTotalSales: nftSales,
+        nftActivities: nftActivities !== null ? nftActivities : [],
       })
     } else {
       throw new Error(`Details are not found for collection: ${req.params.collection_name}`)
