@@ -5,7 +5,5 @@ const router = express.Router()
 module.exports = () => {
   router.post('/create', controller.createNFTDetails)
   router.get('/get/:id', controller.getNFTDetails)
-  router.get('/statistics/:collection_name', controller.getStatistics);
-
   return router
 }
