@@ -57,7 +57,7 @@ const addASaleEvent = async (req, res) => {
       const {
         tnx_sol_amount,
         tnx_usd_amount,
-        offer_id
+        ahNftOfferId
         } = req.body
 
         const nft = await AhNFTSale.findOne({
@@ -67,7 +67,7 @@ const addASaleEvent = async (req, res) => {
         nft.set({
           tnx_sol_amount,
           tnx_usd_amount,
-          offer_id
+          ahNftOfferId
         })
 
         await nft.save()
@@ -95,15 +95,16 @@ const getNFTforSale = async (req, res) => {
     try {
         let NFTforSale;
         if (req.params.id) {
-            NFTforSale = await AhNFTSale.findAll({
-                where: { mint: req.params.id },
+            NFTforSale = await AhNFTSale.findOne({
+                where: { mint: req.params.id, active: true },
                 include: AhNFTOffers
               })
         }
         else
         {
             NFTforSale = await AhNFTSale.findAll({
-              include: AhNFTOffers
+              include: AhNFTOffers,
+              where: { active: true },
             })
         }
 
