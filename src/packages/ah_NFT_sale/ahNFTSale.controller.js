@@ -95,15 +95,16 @@ const getNFTforSale = async (req, res) => {
     try {
         let NFTforSale;
         if (req.params.id) {
-            NFTforSale = await AhNFTSale.findAll({
-                where: { mint: req.params.id },
+            NFTforSale = await AhNFTSale.findOne({
+                where: { mint: req.params.id, active: true },
                 include: AhNFTOffers
               })
         }
         else
         {
-            NFTforSale = await AhNFTSale.findAll({
-              include: AhNFTOffers
+            NFTforSale = await AhNFTSale.findOne({
+              include: AhNFTOffers,
+              where: { active: true },
             })
         }
 
