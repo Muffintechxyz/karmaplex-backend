@@ -102,7 +102,7 @@ const getNFTforSale = async (req, res) => {
         }
         else
         {
-            NFTforSale = await AhNFTSale.findOne({
+            NFTforSale = await AhNFTSale.findAll({
               include: AhNFTOffers,
               where: { active: true },
             })
