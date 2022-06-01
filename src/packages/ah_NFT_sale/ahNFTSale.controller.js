@@ -3,6 +3,7 @@ const { v4 } = require('uuid')
 const AhNFTSale = require('./ahNFTSale.model')
 const uuidv4 = v4
 const { Sequelize } = require('sequelize')
+const AhNFTOffers = require('../ah_NFT_offers/ahNFToffers.model')
 const Op = Sequelize.Op;
 
 
@@ -95,12 +96,15 @@ const getNFTforSale = async (req, res) => {
         let NFTforSale;
         if (req.params.id) {
             NFTforSale = await AhNFTSale.findAll({
-                where: { mint: req.params.id }
+                where: { mint: req.params.id },
+                include: AhNFTOffers
               })
         }
         else
         {
-            NFTforSale = await AhNFTSale.findAll()
+            NFTforSale = await AhNFTSale.findAll({
+              include: AhNFTOffers
+            })
         }
 
         if (NFTforSale && NFTforSale.length > 0) {
@@ -121,14 +125,16 @@ const getNFTforSaleByCollection = async (req, res) => {
       var seller = req.query?.seller;
       if (req.params.id) {
           NFTforSale = await AhNFTSale.findAll({
-              where: { collection: req.params.id }
+              where: { collection: req.params.id },
+              include: AhNFTOffers
             })
       }
       else
       {
           NFTforSale = await AhNFTSale.findAll(
             {                
-              where: { ...(!!seller && {seller_wallet: seller})
+              where: { ...(!!seller && {seller_wallet: seller}),
+              include: AhNFTOffers
           }
         })
       }

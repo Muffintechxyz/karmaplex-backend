@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../../utils/DBConnection')
+const AhNFTOffers = require('../ah_NFT_offers/ahNFToffers.model')
 
 const AhNFTSale = sequelize.define('ah_nft_sale', {
   id: { type: DataTypes.STRING, primaryKey: true },
@@ -13,7 +14,6 @@ const AhNFTSale = sequelize.define('ah_nft_sale', {
   collection: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
   tnx_sol_amount: { type: DataTypes.FLOAT, allowNull: true, defaultValue: 0.0 },
   tnx_usd_amount:  { type: DataTypes.FLOAT, allowNull: true, defaultValue: 0.0 },
-  offer_id: { type: DataTypes.STRING, allowNull: true },
   metadata: { type: DataTypes.JSON, allowNull: true},
   nft_name:  { type: DataTypes.STRING, allowNull: true, defaultValue: null },
   url:  { type: DataTypes.STRING, allowNull: true, defaultValue: null }
@@ -21,5 +21,8 @@ const AhNFTSale = sequelize.define('ah_nft_sale', {
   paranoid: true,
   timestamps: true
 })
+
+AhNFTOffers.hasOne(AhNFTSale)
+AhNFTSale.belongsTo(AhNFTOffers)
 
 module.exports = AhNFTSale
