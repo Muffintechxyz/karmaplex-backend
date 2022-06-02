@@ -19,7 +19,7 @@ const listNFTforSale = async (req, res) => {
             collection,
             metadata, 
             nft_name,
-            url
+            url,
           } = req.body
           const nftSale = await AhNFTSale.create({
             id: uuidv4(),
@@ -32,7 +32,8 @@ const listNFTforSale = async (req, res) => {
             collection,
             metadata, 
             nft_name,
-            url
+            url,
+            active: true
           })
 
           if (nftSale) {
@@ -108,7 +109,7 @@ const getNFTforSale = async (req, res) => {
             })
         }
 
-        if (NFTforSale && NFTforSale.length > 0) {
+        if (!!NFTforSale) {
           return res.status(201).json(NFTforSale)
         } else {
           throw new Error(`Details are not found for NFT mint key: ${req.params.id}`)
