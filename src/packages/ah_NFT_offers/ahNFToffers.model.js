@@ -10,7 +10,7 @@ const AhNFTOffers = sequelize.define('ah_nft_offers', {
   receipt: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
   offer_price:{ type: DataTypes.FLOAT, allowNull: true, defaultValue: 0.0 },
   offer_date: { type: DataTypes.DATE, allowNull: true, defaultValue: sequelize.NOW },
-  network: {type: DataTypes.STRING, allowNull: true, defaultValue: "dev"},
+  network: {type: DataTypes.STRING, allowNull: true, defaultValue: "mainnet"},
   active: { type: DataTypes.BOOLEAN, allowNull: true, defaultValue: false },
   collection: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
   metadata: { type: DataTypes.JSON, allowNull: true},
