@@ -309,6 +309,27 @@ const getStatistics = async (req, res) => {
   }
 }
 
+const getCollectionTotalVolumn = async (req, res) => {
+  try {
+
+    let nftTotalSales = await AhNFTSale.findOne({
+      attributes: [[Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'total_sol'], [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'total_usd']],
+      where: { 
+        collection: req.params.collection_name
+      }
+    })
+
+    return res.status(200).json({
+      nftTotalSales
+    })
+
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: error.message, dateTime: new Date() })
+  }
+}
+
 
 
 module.exports = {
@@ -317,5 +338,6 @@ module.exports = {
     getNFTforSaleByCollection,
     addASaleEvent,
     getStatistics,
-    cancelListing
+    cancelListing,
+    getCollectionTotalVolumn
   }
