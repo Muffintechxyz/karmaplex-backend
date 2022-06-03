@@ -291,8 +291,8 @@ const getTotalStatistics = async (req, res) => {
         'collection',
         [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'tnx_sol_amount'], 
         [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'tnx_usd_amount'],
-        [Sequelize.fn('sum', Sequelize.col('price_floor')), 'floorSolAmount'], 
-        [Sequelize.fn('sum', Sequelize.col('price_floor_usd')), 'floorDollarAmount'],
+        [Sequelize.fn('min', Sequelize.col('price_floor')), 'floorSolAmount'], 
+        [Sequelize.fn('min', Sequelize.col('price_floor_usd')), 'floorDollarAmount'],
         [Sequelize.fn('count', Sequelize.col('mint')), 'itemCount'],
       ],
       group: ['collection']
