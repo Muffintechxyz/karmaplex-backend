@@ -93,6 +93,34 @@ const addASaleEvent = async (req, res) => {
   }
 }
 
+const cancelListing = async (req, res) => { 
+  try {
+        const sale = await AhNFTSale.findOne({
+          where: { id: req.params.id}
+        })
+
+        sale.set({
+          active: false
+        })
+
+        await sale.save()
+
+        if (sale) {
+          console.log(
+            'sale record cancelled',
+            moment(new Date()).format('lll')
+          )
+          return res.status(201).json(sale)
+        } else {
+          throw new Error('Error with updating a sale record')
+        }
+  } catch (error) {
+      return res
+      .status(500)
+      .json({ message: error.message, dateTime: new Date() })
+  }
+}
+
 const getNFTforSale = async (req, res) => {
     try {
         let NFTforSale;
@@ -288,5 +316,6 @@ module.exports = {
     getNFTforSale,
     getNFTforSaleByCollection,
     addASaleEvent,
-    getStatistics
+    getStatistics,
+    cancelListing
   }

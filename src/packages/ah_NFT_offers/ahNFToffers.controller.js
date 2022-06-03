@@ -36,7 +36,8 @@ const makeOffer = async (req, res) => {
             nft_name,
             url,
             receipt,
-            buyerTradeState
+            buyerTradeState,
+            active: true
           })
 
           if (nftOffer) {
@@ -53,6 +54,34 @@ const makeOffer = async (req, res) => {
         .status(500)
         .json({ message: error.message, dateTime: new Date() })
     }
+}
+
+const cancelOffer = async (req, res) => { 
+  try {
+        const offer = await AhNFTOffers.findOne({
+          where: { id: req.params.id}
+        })
+
+        offer.set({
+          active: false
+        })
+
+        await offer.save()
+
+        if (offer) {
+          console.log(
+            'offer record cancelled',
+            moment(new Date()).format('lll')
+          )
+          return res.status(201).json(offer)
+        } else {
+          throw new Error('Error with updating a offer record')
+        }
+  } catch (error) {
+      return res
+      .status(500)
+      .json({ message: error.message, dateTime: new Date() })
+  }
 }
 
 
@@ -95,4 +124,5 @@ const getOffers = async (req, res) => {
 module.exports = {
     makeOffer,
     getOffers,
+    cancelOffer
   }
