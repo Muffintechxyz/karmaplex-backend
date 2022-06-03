@@ -9,6 +9,7 @@ module.exports = () => {
   router.get('/nft/listing/collections/:id', controller.getNFTforSaleByCollection)
   router.patch('/nft/listing/:id', controller.addASaleEvent)
   router.get('/nft/statistics/:collection_name', controller.getStatistics);
+  router.get('/nft/total-statistics', controller.getTotalStatistics);
 
   return router
 }
