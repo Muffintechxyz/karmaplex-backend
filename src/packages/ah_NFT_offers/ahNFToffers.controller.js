@@ -18,7 +18,9 @@ const makeOffer = async (req, res) => {
             collection,
             metadata,
             nft_name,
-            url
+            url,
+            receipt,
+            buyerTradeState
           } = req.body
           const nftOffer = await AhNFTOffers.create({
             id: uuidv4(),
@@ -32,7 +34,9 @@ const makeOffer = async (req, res) => {
             collection,
             metadata,
             nft_name,
-            url
+            url,
+            receipt,
+            buyerTradeState
           })
 
           if (nftOffer) {
@@ -76,7 +80,7 @@ const getOffers = async (req, res) => {
               })
         }
 
-        if (NFTOffer && NFTOffer.length > 0) {
+        if (!!NFTOffer) {
           return res.status(201).json(NFTOffer)
         } else {
           throw new Error(`Offers are not found for filter criteria`)

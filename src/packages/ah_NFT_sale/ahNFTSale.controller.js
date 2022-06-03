@@ -20,6 +20,8 @@ const listNFTforSale = async (req, res) => {
             metadata, 
             nft_name,
             url,
+            receipt,
+            sellerTradeState
           } = req.body
           const nftSale = await AhNFTSale.create({
             id: uuidv4(),
@@ -33,6 +35,8 @@ const listNFTforSale = async (req, res) => {
             metadata, 
             nft_name,
             url,
+            receipt,
+            sellerTradeState,
             active: true
           })
 
@@ -88,9 +92,6 @@ const addASaleEvent = async (req, res) => {
       .json({ message: error.message, dateTime: new Date() })
   }
 }
-
-
-
 
 const getNFTforSale = async (req, res) => {
     try {
