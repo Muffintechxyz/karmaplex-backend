@@ -3,6 +3,7 @@ const { v4 } = require('uuid')
 const AhNFTSale = require('./ahNFTSale.model')
 const uuidv4 = v4
 const { Sequelize } = require('sequelize')
+const AhNFTOffers = require('../ah_NFT_offers/ahNFToffers.model')
 const Op = Sequelize.Op;
 
 
@@ -60,7 +61,7 @@ const addASaleEvent = async (req, res) => {
       const {
         tnx_sol_amount,
         tnx_usd_amount,
-        offer_id
+        ahNftOfferId
         } = req.body
 
         const nft = await AhNFTSale.findOne({
@@ -70,7 +71,7 @@ const addASaleEvent = async (req, res) => {
         nft.set({
           tnx_sol_amount,
           tnx_usd_amount,
-          offer_id
+          ahNftOfferId
         })
 
         await nft.save()
@@ -98,13 +99,17 @@ const getNFTforSale = async (req, res) => {
     try {
         let NFTforSale;
         if (req.params.id) {
-            NFTforSale = await AhNFTSale.findAll({
-                where: { mint: req.params.id }
+            NFTforSale = await AhNFTSale.findOne({
+                where: { mint: req.params.id, active: true },
+                include: AhNFTOffers
               })
         }
         else
         {
-            NFTforSale = await AhNFTSale.findAll()
+            NFTforSale = await AhNFTSale.findAll({
+              include: AhNFTOffers,
+              where: { active: true },
+            })
         }
 
         if (NFTforSale && NFTforSale.length > 0) {
@@ -125,14 +130,16 @@ const getNFTforSaleByCollection = async (req, res) => {
       var seller = req.query?.seller;
       if (req.params.id) {
           NFTforSale = await AhNFTSale.findAll({
-              where: { collection: req.params.id }
+              where: { collection: req.params.id },
+              include: AhNFTOffers
             })
       }
       else
       {
           NFTforSale = await AhNFTSale.findAll(
             {                
-              where: { ...(!!seller && {seller_wallet: seller})
+              where: { ...(!!seller && {seller_wallet: seller}),
+              include: AhNFTOffers
           }
         })
       }
@@ -423,6 +430,27 @@ const getTotalStatistics = async (req, res) => {
   }
 }
 
+const getCollectionTotalVolumn = async (req, res) => {
+  try {
+
+    let nftTotalSales = await AhNFTSale.findOne({
+      attributes: [[Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'total_sol'], [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'total_usd']],
+      where: { 
+        collection: req.params.collection_name
+      }
+    })
+
+    return res.status(200).json({
+      nftTotalSales
+    })
+
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: error.message, dateTime: new Date() })
+  }
+}
+
 
 
 module.exports = {
@@ -431,5 +459,6 @@ module.exports = {
     getNFTforSaleByCollection,
     addASaleEvent,
     getStatistics,
-    getTotalStatistics
+    getTotalStatistics,
+    getCollectionTotalVolumn
   }

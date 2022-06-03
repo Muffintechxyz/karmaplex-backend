@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize')
 const sequelize = require('../../utils/DBConnection')
+const AhNFTOffers = require('../ah_NFT_offers/ahNFToffers.model')
 
 const AhNFTSale = sequelize.define('ah_nft_sale', {
   id: { type: DataTypes.STRING, primaryKey: true },
@@ -23,5 +24,8 @@ const AhNFTSale = sequelize.define('ah_nft_sale', {
   paranoid: true,
   timestamps: true
 })
+
+AhNFTOffers.hasOne(AhNFTSale)
+AhNFTSale.belongsTo(AhNFTOffers)
 
 module.exports = AhNFTSale
