@@ -4,6 +4,7 @@ const router = express.Router()
 
 module.exports = () => {
   router.post('/nft/listing', controller.listNFTforSale)
+  router.get('/nft/collections', controller.getNFTGroupedByCollection)
   router.get('/nft/listing/:id', controller.getNFTforSale)
   router.get('/nft/listing', controller.getNFTforSale)
   router.get('/nft/listing/collections/:id', controller.getNFTforSaleByCollection)

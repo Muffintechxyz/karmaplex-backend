@@ -1,4 +1,5 @@
 const moment = require('moment')
+const _ = require('lodash')
 const { v4 } = require('uuid')
 const AhNFTSale = require('./ahNFTSale.model')
 const uuidv4 = v4
@@ -62,7 +63,8 @@ const addASaleEvent = async (req, res) => {
       const {
         tnx_sol_amount,
         tnx_usd_amount,
-        ahNftOfferId
+        ahNftOfferId,
+        active,
         } = req.body
 
         const nft = await AhNFTSale.findOne({
@@ -72,7 +74,8 @@ const addASaleEvent = async (req, res) => {
         nft.set({
           tnx_sol_amount,
           tnx_usd_amount,
-          ahNftOfferId
+          ahNftOfferId,
+          active,
         })
 
         await nft.save()
@@ -174,6 +177,28 @@ const getNFTforSaleByCollection = async (req, res) => {
         return res.status(201).json(NFTforSale)
       } else {
         throw new Error(`Details are not found for NFT mint key: ${req.params.id}`)
+      }
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: error.message, dateTime: new Date() })
+    }
+}
+
+
+const getNFTGroupedByCollection = async (req, res) => {
+  try {
+      let NFTsforSale;
+      NFTsforSale = await AhNFTSale.findAll(
+        {                
+          include: AhNFTOffers,
+          where: {active: true}
+        })
+      const groupedNFTs = _.groupBy(NFTsforSale, NFTsforSale => NFTsforSale.collection)
+      if (NFTsforSale.length > 0) {
+        return res.status(201).json(groupedNFTs)
+      } else {
+        throw new Error(`No NFTs found`)
       }
     } catch (error) {
       return res
@@ -339,5 +364,6 @@ module.exports = {
     addASaleEvent,
     getStatistics,
     cancelListing,
-    getCollectionTotalVolumn
+    getCollectionTotalVolumn,
+    getNFTGroupedByCollection
   }
