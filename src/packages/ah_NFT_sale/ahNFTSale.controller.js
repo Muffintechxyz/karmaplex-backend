@@ -21,6 +21,8 @@ const listNFTforSale = async (req, res) => {
             metadata, 
             nft_name,
             url,
+            price_floor,
+            price_floor_usd,
             receipt,
             sellerTradeState
           } = req.body
@@ -36,6 +38,8 @@ const listNFTforSale = async (req, res) => {
             metadata, 
             nft_name,
             url,
+            price_floor,
+            price_floor_usd,
             receipt,
             sellerTradeState,
             active: true
@@ -334,6 +338,153 @@ const getStatistics = async (req, res) => {
   }
 }
 
+const getTotalStatistics = async (req, res) => {
+  try {
+
+    let nftStatistics = await AhNFTSale.findAll({
+      attributes: [
+        'collection',
+        [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'tnx_sol_amount'], 
+        [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'tnx_usd_amount'],
+        [Sequelize.fn('min', Sequelize.col('price_floor')), 'floorSolAmount'], 
+        [Sequelize.fn('min', Sequelize.col('price_floor_usd')), 'floorDollarAmount'],
+        [Sequelize.fn('count', Sequelize.col('mint')), 'itemCount'],
+      ],
+      group: ['collection']
+    })
+
+    //serialize sequelize object
+    nftStatistics = JSON.parse(JSON.stringify(nftStatistics));
+
+    let nftStates = [];
+
+    //weekly stats dates
+    let startDate = moment().subtract(6, "day").format("YYYY-MM-DD");
+    let endDate = moment().format("YYYY-MM-DD");
+
+    let i = 0;
+    for (const ntfStat of nftStatistics) {
+
+      //weekly stats data
+      let nftStatistics7days = await AhNFTSale.findOne({
+        attributes: [
+          [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'tnx_sol_amount'], 
+          [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'tnx_usd_amount'],
+        ],
+        where: { 
+          collection: ntfStat.collection,
+          [Op.and]: [
+            Sequelize.where(Sequelize.fn('date', Sequelize.col('end_date')), '>=', startDate),
+            Sequelize.where(Sequelize.fn('date', Sequelize.col('end_date')), '<=', endDate),
+          ]
+        }
+      })
+
+      nftStatistics7days = JSON.parse(JSON.stringify(nftStatistics7days));
+
+      let nft7DayValue = 0;
+
+      if(nftStatistics7days){
+        nft7DayValue = nftStatistics7days.tnx_sol_amount
+      }
+
+      //24hour stats data
+      let nftStatistics24Hours = await AhNFTSale.findOne({
+        attributes: [
+          [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'tnx_sol_amount'], 
+          [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'tnx_usd_amount'],
+          [Sequelize.fn('count', Sequelize.col('mint')), 'itemCount']
+        ],
+        where: { 
+          collection: ntfStat.collection,
+          [Op.and]: [
+            Sequelize.where(Sequelize.fn('date', Sequelize.col('end_date')), '=', endDate),
+          ]
+        }
+      })
+
+      nftStatistics24Hours = JSON.parse(JSON.stringify(nftStatistics24Hours));
+
+      let nft24HourValue = 0;
+      let nft24HourDollarValue = 0
+      let itemCount24Hours = 0;
+
+      if(nftStatistics24Hours){
+
+        itemCount24Hours = nftStatistics24Hours.itemCount !== null ? nftStatistics24Hours.itemCount : 0;
+
+        nft24HourValue = nftStatistics24Hours.tnx_sol_amount !== null ? itemCount24Hours > 0 ? (nftStatistics24Hours.tnx_sol_amount / itemCount24Hours).toFixed(5) : 0 : 0;
+        nft24HourDollarValue = nftStatistics24Hours.tnx_usd_amount !== null ? itemCount24Hours > 0 ? (nftStatistics24Hours.tnx_usd_amount / itemCount24Hours).toFixed(5) : 0  : 0;
+      }
+
+      let temp = {
+        id: i, 
+        rank: "#"+(i+1), 
+        NFTName: ntfStat.collection, 
+        itemCount: ntfStat.itemCount, 
+        image: null, 
+        marketCap: {
+          amount: ntfStat.tnx_sol_amount,
+          dollarValue: "$"+ntfStat.tnx_usd_amount
+        },
+        volume: {
+          volumeAmount: nft7DayValue,
+          volumePercentage: '',
+          isPositive: true
+        },
+        avgPrice: {
+          avgSolAmount: nft24HourValue,
+          history: nft24HourDollarValue
+        },
+        floorPrice: {
+          floorSolAmount: ntfStat.floorSolAmount !== null ? ntfStat.floorSolAmount : 0,
+          floorDollarAmount: ntfStat.floorDollarAmount !== null ? ntfStat.floorDollarAmount : 0
+        }
+      };
+
+      i++;
+
+      nftStates.push(temp);
+
+      
+      
+    }
+
+    //Statbar calculations
+    let statBar = await AhNFTSale.findOne({
+      attributes: [
+        [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'volumn'],
+        [Sequelize.fn('count', Sequelize.col('collection')), 'collection']
+      ],
+      raw: true,
+    });
+
+    //get owner count
+    let owners = await AhNFTSale.count({
+      col: 'seller_wallet',
+      distinct: true,
+    });
+
+    //serialize sequelize object
+    owners = JSON.parse(JSON.stringify(owners));
+
+    //serialize sequelize object
+    statBar = JSON.parse(JSON.stringify(statBar));
+
+    statBar["categories"] = 4;
+    statBar["owners"] = owners;
+
+    return res.status(200).json({
+      nftStates,
+      statBar
+    })
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: error.message, dateTime: new Date() })
+  }
+}
+
 const getCollectionTotalVolumn = async (req, res) => {
   try {
 
@@ -363,6 +514,8 @@ module.exports = {
     getNFTforSaleByCollection,
     addASaleEvent,
     getStatistics,
+    getTotalStatistics,
+    getCollectionTotalVolumn,
     cancelListing,
     getCollectionTotalVolumn,
     getNFTGroupedByCollection
