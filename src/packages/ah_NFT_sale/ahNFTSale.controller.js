@@ -1,4 +1,5 @@
 const moment = require('moment')
+const _ = require('lodash')
 const { v4 } = require('uuid')
 const AhNFTSale = require('./ahNFTSale.model')
 const uuidv4 = v4
@@ -21,7 +22,9 @@ const listNFTforSale = async (req, res) => {
             nft_name,
             url,
             price_floor,
-            price_floor_usd
+            price_floor_usd,
+            receipt,
+            sellerTradeState
           } = req.body
           const nftSale = await AhNFTSale.create({
             id: uuidv4(),
@@ -36,7 +39,10 @@ const listNFTforSale = async (req, res) => {
             nft_name,
             url,
             price_floor,
-            price_floor_usd
+            price_floor_usd,
+            receipt,
+            sellerTradeState,
+            active: true
           })
 
           if (nftSale) {
@@ -61,7 +67,8 @@ const addASaleEvent = async (req, res) => {
       const {
         tnx_sol_amount,
         tnx_usd_amount,
-        ahNftOfferId
+        ahNftOfferId,
+        active,
         } = req.body
 
         const nft = await AhNFTSale.findOne({
@@ -71,7 +78,8 @@ const addASaleEvent = async (req, res) => {
         nft.set({
           tnx_sol_amount,
           tnx_usd_amount,
-          ahNftOfferId
+          ahNftOfferId,
+          active,
         })
 
         await nft.save()
@@ -92,8 +100,33 @@ const addASaleEvent = async (req, res) => {
   }
 }
 
+const cancelListing = async (req, res) => { 
+  try {
+        const sale = await AhNFTSale.findOne({
+          where: { id: req.params.id}
+        })
 
+        sale.set({
+          active: false
+        })
 
+        await sale.save()
+
+        if (sale) {
+          console.log(
+            'sale record cancelled',
+            moment(new Date()).format('lll')
+          )
+          return res.status(201).json(sale)
+        } else {
+          throw new Error('Error with updating a sale record')
+        }
+  } catch (error) {
+      return res
+      .status(500)
+      .json({ message: error.message, dateTime: new Date() })
+  }
+}
 
 const getNFTforSale = async (req, res) => {
     try {
@@ -112,7 +145,7 @@ const getNFTforSale = async (req, res) => {
             })
         }
 
-        if (NFTforSale && NFTforSale.length > 0) {
+        if (!!NFTforSale) {
           return res.status(201).json(NFTforSale)
         } else {
           throw new Error(`Details are not found for NFT mint key: ${req.params.id}`)
@@ -148,6 +181,28 @@ const getNFTforSaleByCollection = async (req, res) => {
         return res.status(201).json(NFTforSale)
       } else {
         throw new Error(`Details are not found for NFT mint key: ${req.params.id}`)
+      }
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: error.message, dateTime: new Date() })
+    }
+}
+
+
+const getNFTGroupedByCollection = async (req, res) => {
+  try {
+      let NFTsforSale;
+      NFTsforSale = await AhNFTSale.findAll(
+        {                
+          include: AhNFTOffers,
+          where: {active: true}
+        })
+      const groupedNFTs = _.groupBy(NFTsforSale, NFTsforSale => NFTsforSale.collection)
+      if (NFTsforSale.length > 0) {
+        return res.status(201).json(groupedNFTs)
+      } else {
+        throw new Error(`No NFTs found`)
       }
     } catch (error) {
       return res
@@ -460,5 +515,8 @@ module.exports = {
     addASaleEvent,
     getStatistics,
     getTotalStatistics,
-    getCollectionTotalVolumn
+    getCollectionTotalVolumn,
+    cancelListing,
+    getCollectionTotalVolumn,
+    getNFTGroupedByCollection
   }

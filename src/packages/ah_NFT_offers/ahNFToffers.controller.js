@@ -18,7 +18,9 @@ const makeOffer = async (req, res) => {
             collection,
             metadata,
             nft_name,
-            url
+            url,
+            receipt,
+            buyerTradeState
           } = req.body
           const nftOffer = await AhNFTOffers.create({
             id: uuidv4(),
@@ -32,7 +34,10 @@ const makeOffer = async (req, res) => {
             collection,
             metadata,
             nft_name,
-            url
+            url,
+            receipt,
+            buyerTradeState,
+            active: true
           })
 
           if (nftOffer) {
@@ -49,6 +54,34 @@ const makeOffer = async (req, res) => {
         .status(500)
         .json({ message: error.message, dateTime: new Date() })
     }
+}
+
+const cancelOffer = async (req, res) => { 
+  try {
+        const offer = await AhNFTOffers.findOne({
+          where: { id: req.params.id}
+        })
+
+        offer.set({
+          active: false
+        })
+
+        await offer.save()
+
+        if (offer) {
+          console.log(
+            'offer record cancelled',
+            moment(new Date()).format('lll')
+          )
+          return res.status(201).json(offer)
+        } else {
+          throw new Error('Error with updating a offer record')
+        }
+  } catch (error) {
+      return res
+      .status(500)
+      .json({ message: error.message, dateTime: new Date() })
+  }
 }
 
 
@@ -76,7 +109,7 @@ const getOffers = async (req, res) => {
               })
         }
 
-        if (NFTOffer && NFTOffer.length > 0) {
+        if (!!NFTOffer) {
           return res.status(201).json(NFTOffer)
         } else {
           throw new Error(`Offers are not found for filter criteria`)
@@ -91,4 +124,5 @@ const getOffers = async (req, res) => {
 module.exports = {
     makeOffer,
     getOffers,
+    cancelOffer
   }
