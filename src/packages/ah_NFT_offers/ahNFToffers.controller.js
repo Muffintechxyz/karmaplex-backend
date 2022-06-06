@@ -48,7 +48,7 @@ const makeOffer = async (req, res) => {
             return res.status(201).json(nftOffer)
           } else {
             return res
-            .status(200)
+            .status(400)
             .json({ message: `Error with add new nftOffer record`, dateTime: new Date() })
           }
     } catch (error) {
@@ -78,7 +78,7 @@ const cancelOffer = async (req, res) => {
           return res.status(201).json(offer)
         } else {
           return res
-          .status(200)
+          .status(400)
           .json({ message: `Error with updating a offer record`, dateTime: new Date() })
         }
   } catch (error) {
@@ -119,7 +119,7 @@ const getOffers = async (req, res) => {
           return res.status(201).json(NFTOffer)
         } else {
           return res
-          .status(200)
+          .status(400)
           .json({ message: `Offers are not found for filter criteria`, dateTime: new Date() })
         }
       } catch (error) {
