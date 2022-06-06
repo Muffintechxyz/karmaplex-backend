@@ -93,7 +93,9 @@ const addASaleEvent = async (req, res) => {
           )
           return res.status(201).json(nft)
         } else {
-          throw new Error('Error with updating a nftSale record')
+          return res
+          .status(200)
+          .json({ message: 'Error with updating a nftSale record', dateTime: new Date() })
         }
   } catch (error) {
       return res
@@ -121,7 +123,9 @@ const cancelListing = async (req, res) => {
           )
           return res.status(201).json(sale)
         } else {
-          throw new Error('Error with updating a sale record')
+          return res
+          .status(200)
+          .json({ message: 'Error with updating a sale record', dateTime: new Date() })
         }
   } catch (error) {
       return res
@@ -150,7 +154,9 @@ const getNFTforSale = async (req, res) => {
         if (!!NFTforSale) {
           return res.status(201).json(NFTforSale)
         } else {
-          throw new Error(`Details are not found for NFT mint key: ${req.params.id}`)
+          return res
+          .status(200)
+          .json({ message: `Details are not found for NFT mint key: ${req.params.id}`, dateTime: new Date() })
         }
       } catch (error) {
         return res
@@ -182,7 +188,9 @@ const getNFTforSaleByCollection = async (req, res) => {
       if (NFTforSale && NFTforSale.length > 0) {
         return res.status(201).json(NFTforSale)
       } else {
-        throw new Error(`Details are not found for NFT mint key: ${req.params.id}`)
+        return res
+        .status(200)
+        .json({ message: `Details are not found for NFT mint key: ${req.params.id}`, dateTime: new Date() })
       }
     } catch (error) {
       return res
@@ -202,11 +210,11 @@ const getNFTGroupedByCollection = async (req, res) => {
         })
       const groupedNFTs = _.groupBy(NFTsforSale, NFTsforSale => NFTsforSale.collection)
 
-        return res.status(201).json(Object.keys(groupedNFTs).map(key => ({ collection: key, nfts: groupedNFTs[key] })))
+      return res.status(201).json(Object.keys(groupedNFTs).map(key => ({ collection: key, nfts: groupedNFTs[key] })))
 
     } catch (error) {
       return res
-        .status(500)
+        .status(200)
         .json({ message: error.message, dateTime: new Date() })
     }
 }
@@ -329,11 +337,13 @@ const getStatistics = async (req, res) => {
         nftActivities: nftActivities !== null ? nftActivities : [],
       })
     } else {
-      throw new Error(`Details are not found for collection: ${req.params.collection_name}`)
+      return res
+      .status(200)
+      .json({ message: `Details are not found for collection: ${req.params.collection_name}`, dateTime: new Date() })
     }
   } catch (error) {
     return res
-      .status(400)
+      .status(200)
       .json({ message: error.message, dateTime: new Date() })
   }
 }
@@ -480,7 +490,7 @@ const getTotalStatistics = async (req, res) => {
     })
   } catch (error) {
     return res
-      .status(400)
+      .status(200)
       .json({ message: error.message, dateTime: new Date() })
   }
 }
@@ -501,7 +511,7 @@ const getCollectionTotalVolumn = async (req, res) => {
 
   } catch (error) {
     return res
-      .status(400)
+      .status(200)
       .json({ message: error.message, dateTime: new Date() })
   }
 }
