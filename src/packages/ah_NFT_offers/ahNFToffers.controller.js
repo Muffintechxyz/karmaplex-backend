@@ -1,5 +1,6 @@
 const moment = require('moment')
 const { v4 } = require('uuid')
+const AhNFTSale = require('../ah_NFT_sale/ahNFTSale.model')
 const AhNFTOffers = require('./ahNFToffers.model')
 
 const uuidv4 = v4
@@ -101,7 +102,7 @@ const getOffers = async (req, res) => {
                     active: true,
                     ...(!!seller && {seller_wallet: seller}),
                     ...(!!buyer && {buyer_wallet: buyer})
-                }
+                },
               })
         }
         else
@@ -111,7 +112,7 @@ const getOffers = async (req, res) => {
                     active: true,
                     ...(!!seller && {seller_wallet: seller}),
                     ...(!!buyer && {buyer_wallet: buyer})
-                }
+                },
               })
         }
 

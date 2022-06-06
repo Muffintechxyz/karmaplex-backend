@@ -13,6 +13,7 @@ module.exports = () => {
   router.get('/nft/statistics/:collection_name', controller.getStatistics);
   router.get('/nft/total-statistics', controller.getTotalStatistics);
   router.get('/nft/total-volumn/:collection_name', controller.getCollectionTotalVolumn);
+  router.get('/nft/sales/:id', controller.getAllSoldActivities)
 
   return router
 }
