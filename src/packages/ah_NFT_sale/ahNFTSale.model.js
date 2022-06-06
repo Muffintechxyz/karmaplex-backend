@@ -19,6 +19,7 @@ const AhNFTSale = sequelize.define('ah_nft_sale', {
   nft_name:  { type: DataTypes.STRING, allowNull: true, defaultValue: null },
   url:  { type: DataTypes.STRING, allowNull: true, defaultValue: null },
   sellerTradeState:  { type: DataTypes.STRING, allowNull: true, defaultValue: null },
+  extendedData: { type: DataTypes.JSON, allowNull: true},
 }, {
   paranoid: true,
   timestamps: true
