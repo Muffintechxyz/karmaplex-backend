@@ -94,7 +94,7 @@ const addASaleEvent = async (req, res) => {
           return res.status(201).json(nft)
         } else {
           return res
-          .status(200)
+          .status(400)
           .json({ message: 'Error with updating a nftSale record', dateTime: new Date() })
         }
   } catch (error) {
@@ -124,7 +124,7 @@ const cancelListing = async (req, res) => {
           return res.status(201).json(sale)
         } else {
           return res
-          .status(200)
+          .status(400)
           .json({ message: 'Error with updating a sale record', dateTime: new Date() })
         }
   } catch (error) {
@@ -155,7 +155,7 @@ const getNFTforSale = async (req, res) => {
           return res.status(201).json(NFTforSale)
         } else {
           return res
-          .status(200)
+          .status(400)
           .json({ message: `Details are not found for NFT mint key: ${req.params.id}`, dateTime: new Date() })
         }
       } catch (error) {
@@ -189,7 +189,7 @@ const getNFTforSaleByCollection = async (req, res) => {
         return res.status(201).json(NFTforSale)
       } else {
         return res
-        .status(200)
+        .status(400)
         .json({ message: `Details are not found for NFT mint key: ${req.params.id}`, dateTime: new Date() })
       }
     } catch (error) {
@@ -214,7 +214,7 @@ const getNFTGroupedByCollection = async (req, res) => {
 
     } catch (error) {
       return res
-        .status(200)
+        .status(400)
         .json({ message: error.message, dateTime: new Date() })
     }
 }
@@ -331,19 +331,19 @@ const getStatistics = async (req, res) => {
         total_usd: nftTotalSales ? nftTotalSales.total_usd != null ? nftTotalSales.total_usd : 0 : 0
       }
 
-      return res.status(200).json({
+      return res.status(400).json({
         days7,
         nftTotalSales: nftSales,
         nftActivities: nftActivities !== null ? nftActivities : [],
       })
     } else {
       return res
-      .status(200)
+      .status(400)
       .json({ message: `Details are not found for collection: ${req.params.collection_name}`, dateTime: new Date() })
     }
   } catch (error) {
     return res
-      .status(200)
+      .status(400)
       .json({ message: error.message, dateTime: new Date() })
   }
 }
@@ -490,7 +490,7 @@ const getTotalStatistics = async (req, res) => {
     })
   } catch (error) {
     return res
-      .status(200)
+      .status(400)
       .json({ message: error.message, dateTime: new Date() })
   }
 }
@@ -511,7 +511,7 @@ const getCollectionTotalVolumn = async (req, res) => {
 
   } catch (error) {
     return res
-      .status(200)
+      .status(400)
       .json({ message: error.message, dateTime: new Date() })
   }
 }
