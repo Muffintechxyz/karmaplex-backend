@@ -11,9 +11,8 @@ module.exports = () => {
   router.patch('/nft/listing/:id', controller.addASaleEvent)
   router.delete('/nft/listing/:id', controller.cancelListing)
   router.get('/nft/statistics/:collection_name', controller.getStatistics);
+  router.get('/nft/total-statistics', controller.getTotalStatistics);
   router.get('/nft/total-volumn/:collection_name', controller.getCollectionTotalVolumn);
-
-  
 
   return router
 }
