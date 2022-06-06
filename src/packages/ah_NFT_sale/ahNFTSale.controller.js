@@ -24,7 +24,8 @@ const listNFTforSale = async (req, res) => {
             price_floor,
             price_floor_usd,
             receipt,
-            sellerTradeState
+            sellerTradeState,
+            extendedData
           } = req.body
           const nftSale = await AhNFTSale.create({
             id: uuidv4(),
@@ -42,7 +43,8 @@ const listNFTforSale = async (req, res) => {
             price_floor_usd,
             receipt,
             sellerTradeState,
-            active: true
+            extendedData,
+            active: true,
           })
 
           if (nftSale) {
@@ -79,7 +81,7 @@ const addASaleEvent = async (req, res) => {
           tnx_sol_amount,
           tnx_usd_amount,
           ahNftOfferId,
-          active,
+          active: false,
         })
 
         await nft.save()
@@ -163,7 +165,7 @@ const getNFTforSaleByCollection = async (req, res) => {
       var seller = req.query?.seller;
       if (req.params.id) {
           NFTforSale = await AhNFTSale.findAll({
-              where: { collection: req.params.id },
+              where: { collection: req.params.id, active: true },
               include: AhNFTOffers
             })
       }
@@ -199,11 +201,9 @@ const getNFTGroupedByCollection = async (req, res) => {
           where: {active: true}
         })
       const groupedNFTs = _.groupBy(NFTsforSale, NFTsforSale => NFTsforSale.collection)
-      if (NFTsforSale.length > 0) {
-        return res.status(201).json(groupedNFTs)
-      } else {
-        throw new Error(`No NFTs found`)
-      }
+
+        return res.status(201).json(Object.keys(groupedNFTs).map(key => ({ collection: key, nfts: groupedNFTs[key] })))
+
     } catch (error) {
       return res
         .status(500)

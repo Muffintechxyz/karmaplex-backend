@@ -94,6 +94,7 @@ const getOffers = async (req, res) => {
             NFTOffer = await AhNFTOffers.findAll({
                 where: { 
                     mint: req.params.id,
+                    active: true,
                     ...(!!seller && {seller_wallet: seller}),
                     ...(!!buyer && {buyer_wallet: buyer})
                 }
@@ -103,6 +104,7 @@ const getOffers = async (req, res) => {
         {
             NFTOffer = await AhNFTOffers.findAll({
                 where: { 
+                    active: true,
                     ...(!!seller && {seller_wallet: seller}),
                     ...(!!buyer && {buyer_wallet: buyer})
                 }
