@@ -86,6 +86,24 @@ const addASaleEvent = async (req, res) => {
 
         await nft.save()
 
+        const offers = await AhNFTOffers.findAll({
+          where: {mint: nft.mint}
+        })
+
+        if (Array.isArray(offers)) {
+          offers.forEach((offer) => {
+            offer.set({
+              active: false
+            })
+          })
+        }else{
+          offers.set({
+            active: false
+          })
+        }
+
+        await offers.save()
+
         if (nft) {
           console.log(
             'nftSale record created',
