@@ -302,20 +302,14 @@ const getStatistics = async (req, res) => {
     let nftTotalSales = await AhNFTSale.findOne({
       attributes: [[Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'total_sol'], [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'total_usd']],
       where: {
-        collection: req.params.collection_name,
-        end_date: {
-          [Op.between]: [startDate, endDate],
-        }
+        collection: req.params.collection_name
       }
     })
 
     let nftActivities = await AhNFTSale.findAll({
       attributes: [['mint', 'description'], ['tnx_usd_amount', 'price'], ['auction_house_wallet', 'fromAddress'], ['seller_wallet', 'toAddress'], ['end_date', 'time'], ['url', 'image']],
       where: {
-        collection: req.params.collection_name,
-        end_date: {
-          [Op.between]: [startDate, endDate],
-        }
+        collection: req.params.collection_name
       }
     })
 
