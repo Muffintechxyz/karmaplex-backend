@@ -8,204 +8,218 @@ const AhNFTOffers = require('../ah_NFT_offers/ahNFToffers.model')
 const Op = Sequelize.Op;
 
 
-const listNFTforSale = async (req, res) => { 
-    try {
-        const {
-            mint,
-            auction_house_wallet,
-            seller_wallet,
-            sale_price,
-            end_date,
-            network,
-            collection,
-            metadata, 
-            nft_name,
-            url,
-            price_floor,
-            price_floor_usd,
-            receipt,
-            sellerTradeState,
-            extendedData
-          } = req.body
-          const nftSale = await AhNFTSale.create({
-            id: uuidv4(),
-            mint,
-            auction_house_wallet,
-            seller_wallet,
-            sale_price,
-            end_date,
-            network,
-            collection,
-            metadata, 
-            nft_name,
-            url,
-            price_floor,
-            price_floor_usd,
-            receipt,
-            sellerTradeState,
-            extendedData,
-            active: true,
-          })
-
-          if (nftSale) {
-            console.log(
-              'nftSale record created',
-              moment(new Date()).format('lll')
-            )
-            return res.status(201).json(nftSale)
-          } else {
-            throw new Error('Error with add new nftSale record')
-          }
-    } catch (error) {
-        return res
-        .status(500)
-        .json({ message: error.message, dateTime: new Date() })
-    }
-}
-
-
-const addASaleEvent = async (req, res) => { 
+const listNFTforSale = async (req, res) => {
   try {
-      const {
-        tnx_sol_amount,
-        tnx_usd_amount,
-        ahNftOfferId,
-        active,
-        } = req.body
+    const {
+      mint,
+      auction_house_wallet,
+      seller_wallet,
+      sale_price,
+      end_date,
+      network,
+      collection,
+      metadata,
+      nft_name,
+      url,
+      price_floor,
+      price_floor_usd,
+      receipt,
+      sellerTradeState,
+      extendedData
+    } = req.body
+    const nftSale = await AhNFTSale.create({
+      id: uuidv4(),
+      mint,
+      auction_house_wallet,
+      seller_wallet,
+      sale_price,
+      end_date,
+      network,
+      collection,
+      metadata,
+      nft_name,
+      url,
+      price_floor,
+      price_floor_usd,
+      receipt,
+      sellerTradeState,
+      extendedData,
+      active: true,
+    })
 
-        const nft = await AhNFTSale.findOne({
-          where: { id: req.params.id}
-        })
-
-        nft.set({
-          tnx_sol_amount,
-          tnx_usd_amount,
-          ahNftOfferId,
-          active: false,
-        })
-
-        await nft.save()
-
-        const offers = await AhNFTOffers.findAll({
-          where: {mint: nft.mint}
-        })
-
-        if (Array.isArray(offers)) {
-          offers.forEach((offer) => {
-            offer.set({
-              active: false
-            })
-          })
-        }else{
-          offers.set({
-            active: false
-          })
-        }
-
-        await offers.save()
-
-        if (nft) {
-          console.log(
-            'nftSale record created',
-            moment(new Date()).format('lll')
-          )
-          return res.status(201).json(nft)
-        } else {
-          return res
-          .status(400)
-          .json({ message: 'Error with updating a nftSale record', dateTime: new Date() })
-        }
+    if (nftSale) {
+      console.log(
+        'nftSale record created',
+        moment(new Date()).format('lll')
+      )
+      return res.status(201).json(nftSale)
+    } else {
+      throw new Error('Error with add new nftSale record')
+    }
   } catch (error) {
-      return res
+    return res
       .status(500)
       .json({ message: error.message, dateTime: new Date() })
   }
 }
 
-const cancelListing = async (req, res) => { 
-  try {
-        const sale = await AhNFTSale.findOne({
-          where: { id: req.params.id}
-        })
 
-        sale.set({
+const addASaleEvent = async (req, res) => {
+  try {
+    const {
+      tnx_sol_amount,
+      tnx_usd_amount,
+      ahNftOfferId,
+      active,
+    } = req.body
+
+    const nft = await AhNFTSale.findOne({
+      where: { id: req.params.id }
+    })
+
+    nft.set({
+      tnx_sol_amount,
+      tnx_usd_amount,
+      ahNftOfferId,
+      active: false,
+    })
+
+    await nft.save()
+
+    const offers = await AhNFTOffers.findAll({
+      where: { mint: nft.mint }
+    })
+
+    if (Array.isArray(offers)) {
+      offers.forEach((offer) => {
+        offer.set({
           active: false
         })
+      })
+    } else {
+      offers.set({
+        active: false
+      })
+    }
 
-        await sale.save()
+    await offers.save()
 
-        if (sale) {
-          console.log(
-            'sale record cancelled',
-            moment(new Date()).format('lll')
-          )
-          return res.status(201).json(sale)
-        } else {
-          return res
-          .status(400)
-          .json({ message: 'Error with updating a sale record', dateTime: new Date() })
-        }
-  } catch (error) {
+    if (nft) {
+      console.log(
+        'nftSale record created',
+        moment(new Date()).format('lll')
+      )
+      return res.status(201).json(nft)
+    } else {
       return res
+        .status(400)
+        .json({ message: 'Error with updating a nftSale record', dateTime: new Date() })
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message, dateTime: new Date() })
+  }
+}
+
+const cancelListing = async (req, res) => {
+  try {
+    const sale = await AhNFTSale.findOne({
+      where: { id: req.params.id }
+    })
+
+    sale.set({
+      active: false
+    })
+
+    await sale.save()
+
+    if (sale) {
+      console.log(
+        'sale record cancelled',
+        moment(new Date()).format('lll')
+      )
+      return res.status(201).json(sale)
+    } else {
+      return res
+        .status(400)
+        .json({ message: 'Error with updating a sale record', dateTime: new Date() })
+    }
+  } catch (error) {
+    return res
       .status(500)
       .json({ message: error.message, dateTime: new Date() })
   }
 }
 
 const getNFTforSale = async (req, res) => {
-    try {
-        let NFTforSale;
-        if (req.params.id) {
-            NFTforSale = await AhNFTSale.findOne({
-                where: { mint: req.params.id, active: true },
-                include: AhNFTOffers
-              })
-        }
-        else
-        {
-            NFTforSale = await AhNFTSale.findAll({
-              include: AhNFTOffers,
-              where: { active: true },
-            })
-        }
-
-        if (!!NFTforSale) {
-          return res.status(201).json(NFTforSale)
-        } else {
-          return res
-          .status(400)
-          .json({ message: `Details are not found for NFT mint key: ${req.params.id}`, dateTime: new Date() })
-        }
-      } catch (error) {
-        return res
-          .status(500)
-          .json({ message: error.message, dateTime: new Date() })
-      }
-}
-
-const getAllSoldActivities = async (req, res) => {
   try {
     let NFTforSale;
     if (req.params.id) {
-        NFTforSale = await AhNFTSale.findAll({
-            where: { mint: req.params.id, ahNftOfferId: { [Op.not]: null }},
-            include: AhNFTOffers
-          })
+      NFTforSale = await AhNFTSale.findOne({
+        where: { mint: req.params.id, active: true },
+        include: AhNFTOffers
+      })
     }
-    else
-    {
-        NFTforSale = await AhNFTSale.findAll({
-          include: AhNFTOffers,
-          where: { ahNftOfferId: { [Op.not]: null }},
-        })
+    else {
+      NFTforSale = await AhNFTSale.findAll({
+        include: AhNFTOffers,
+        where: { active: true },
+      })
     }
 
     if (!!NFTforSale) {
       return res.status(201).json(NFTforSale)
     } else {
       return res
-      .status(400)
-      .json({ message: `Details are not found for NFT mint key: ${req.params.id}`, dateTime: new Date() })
+        .status(400)
+        .json({ message: `Details are not found for NFT mint key: ${req.params.id}`, dateTime: new Date() })
+    }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message, dateTime: new Date() })
+  }
+}
+
+const getAllSoldActivities = async (req, res) => {
+  try {
+    let NFTforSale;
+    if (req.params.id) {
+      NFTforSale = await AhNFTSale.findAll({
+        where: {
+          mint: req.params.id, [Op.or]: [
+            {
+              active:
+              {
+                [Op.eq]: true
+              }
+            },
+            {
+              ahNftOfferId:
+              {
+                [Op.not]: null
+              }
+            }
+          ]
+        },
+        order: [['updatedAt', 'DESC']],
+        include: AhNFTOffers
+      })
+    }
+    else {
+      NFTforSale = await AhNFTSale.findAll({
+        include: AhNFTOffers,
+        where: { ahNftOfferId: { [Op.not]: null } },
+      })
+    }
+
+    if (!!NFTforSale) {
+      return res.status(201).json(NFTforSale)
+    } else {
+      return res
+        .status(400)
+        .json({ message: `Details are not found for NFT mint key: ${req.params.id}`, dateTime: new Date() })
     }
   } catch (error) {
     return res
@@ -216,56 +230,56 @@ const getAllSoldActivities = async (req, res) => {
 
 const getNFTforSaleByCollection = async (req, res) => {
   try {
-      let NFTforSale;
-      var seller = req.query?.seller;
-      if (req.params.id) {
-          NFTforSale = await AhNFTSale.findAll({
-              where: { collection: req.params.id, active: true },
-              include: AhNFTOffers
-            })
-      }
-      else
-      {
-          NFTforSale = await AhNFTSale.findAll(
-            {                
-              where: { ...(!!seller && {seller_wallet: seller}),
-              include: AhNFTOffers
+    let NFTforSale;
+    var seller = req.query?.seller;
+    if (req.params.id) {
+      NFTforSale = await AhNFTSale.findAll({
+        where: { collection: req.params.id, active: true },
+        include: AhNFTOffers
+      })
+    }
+    else {
+      NFTforSale = await AhNFTSale.findAll(
+        {
+          where: {
+            ...(!!seller && { seller_wallet: seller }),
+            include: AhNFTOffers
           }
         })
-      }
+    }
 
-      if (NFTforSale && NFTforSale.length > 0) {
-        return res.status(201).json(NFTforSale)
-      } else {
-        return res
+    if (NFTforSale && NFTforSale.length > 0) {
+      return res.status(201).json(NFTforSale)
+    } else {
+      return res
         .status(400)
         .json({ message: `Details are not found for NFT mint key: ${req.params.id}`, dateTime: new Date() })
-      }
-    } catch (error) {
-      return res
-        .status(500)
-        .json({ message: error.message, dateTime: new Date() })
     }
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message, dateTime: new Date() })
+  }
 }
 
 
 const getNFTGroupedByCollection = async (req, res) => {
   try {
-      let NFTsforSale;
-      NFTsforSale = await AhNFTSale.findAll(
-        {                
-          include: AhNFTOffers,
-          where: {active: true}
-        })
-      const groupedNFTs = _.groupBy(NFTsforSale, NFTsforSale => NFTsforSale.collection)
+    let NFTsforSale;
+    NFTsforSale = await AhNFTSale.findAll(
+      {
+        include: AhNFTOffers,
+        where: { active: true }
+      })
+    const groupedNFTs = _.groupBy(NFTsforSale, NFTsforSale => NFTsforSale.collection)
 
-      return res.status(201).json(Object.keys(groupedNFTs).map(key => ({ collection: key, nfts: groupedNFTs[key] })))
+    return res.status(201).json(Object.keys(groupedNFTs).map(key => ({ collection: key, nfts: groupedNFTs[key] })))
 
-    } catch (error) {
-      return res
-        .status(400)
-        .json({ message: error.message, dateTime: new Date() })
-    }
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: error.message, dateTime: new Date() })
+  }
 }
 
 const getStatistics = async (req, res) => {
@@ -275,8 +289,8 @@ const getStatistics = async (req, res) => {
     let endDate = moment().endOf('week').add(1, "day").format("YYYY-MM-DD");
 
     let nftStatistics = await AhNFTSale.findAll({
-      attributes: ['end_date',[Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'total_cost']],
-      where: { 
+      attributes: ['end_date', [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'total_cost']],
+      where: {
         collection: req.params.collection_name,
         end_date: {
           [Op.between]: [startDate, endDate],
@@ -287,7 +301,7 @@ const getStatistics = async (req, res) => {
 
     let nftTotalSales = await AhNFTSale.findOne({
       attributes: [[Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'total_sol'], [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'total_usd']],
-      where: { 
+      where: {
         collection: req.params.collection_name,
         end_date: {
           [Op.between]: [startDate, endDate],
@@ -296,8 +310,8 @@ const getStatistics = async (req, res) => {
     })
 
     let nftActivities = await AhNFTSale.findAll({
-      attributes:[['mint', 'description'],['tnx_usd_amount', 'price'], ['auction_house_wallet','fromAddress'], ['seller_wallet','toAddress'], ['end_date','time'], ['url', 'image']],
-      where: { 
+      attributes: [['mint', 'description'], ['tnx_usd_amount', 'price'], ['auction_house_wallet', 'fromAddress'], ['seller_wallet', 'toAddress'], ['end_date', 'time'], ['url', 'image']],
+      where: {
         collection: req.params.collection_name,
         end_date: {
           [Op.between]: [startDate, endDate],
@@ -312,66 +326,66 @@ const getStatistics = async (req, res) => {
 
       let days7 = [];
       let nextInLine = "Monday";
-      for(let i = 0; i < 7; i++){
+      for (let i = 0; i < 7; i++) {
 
-          let currentSales = nftStatistics[i] || {end_date: null};
-          if(nextInLine === moment(currentSales["end_date"]).format("dddd")){
-            days7.push({
-              label: moment(currentSales["end_date"]).format("dddd"),
-              price: currentSales.total_cost
-            })
+        let currentSales = nftStatistics[i] || { end_date: null };
+        if (nextInLine === moment(currentSales["end_date"]).format("dddd")) {
+          days7.push({
+            label: moment(currentSales["end_date"]).format("dddd"),
+            price: currentSales.total_cost
+          })
 
-            nextInLine = moment(currentSales["end_date"]).add(1, "day").format("dddd")
-          }else if(nextInLine === "Monday") {
-            days7.push({
-              label: "Monday",
-              price: 0
-            })
+          nextInLine = moment(currentSales["end_date"]).add(1, "day").format("dddd")
+        } else if (nextInLine === "Monday") {
+          days7.push({
+            label: "Monday",
+            price: 0
+          })
 
-            nextInLine = "Tuesday"
-          }else if(nextInLine === "Tuesday") {
-            days7.push({
-              label: "Tuesday",
-              price: 0
-            })
+          nextInLine = "Tuesday"
+        } else if (nextInLine === "Tuesday") {
+          days7.push({
+            label: "Tuesday",
+            price: 0
+          })
 
-            nextInLine = "Wednesday"
-          }else if(nextInLine === "Wednesday") {
-            days7.push({
-              label: "Wednesday",
-              price: 0
-            })
+          nextInLine = "Wednesday"
+        } else if (nextInLine === "Wednesday") {
+          days7.push({
+            label: "Wednesday",
+            price: 0
+          })
 
-            nextInLine = "Thursday"
-          }else if(nextInLine === "Thursday") {
-            days7.push({
-              label: "Thursday",
-              price: 0
-            })
+          nextInLine = "Thursday"
+        } else if (nextInLine === "Thursday") {
+          days7.push({
+            label: "Thursday",
+            price: 0
+          })
 
-            nextInLine = "Friday"
-          }else if(nextInLine === "Friday") {
-            days7.push({
-              label: "Friday",
-              price: 0
-            })
+          nextInLine = "Friday"
+        } else if (nextInLine === "Friday") {
+          days7.push({
+            label: "Friday",
+            price: 0
+          })
 
-            nextInLine = "Saturday"
-          }else if(nextInLine === "Saturday") {
-            days7.push({
-              label: "Saturday",
-              price: 0
-            })
+          nextInLine = "Saturday"
+        } else if (nextInLine === "Saturday") {
+          days7.push({
+            label: "Saturday",
+            price: 0
+          })
 
-            nextInLine = "Sunday"
-          }else if(nextInLine === "Sunday") {
-            days7.push({
-              label: "Sunday",
-              price: 0
-            })
+          nextInLine = "Sunday"
+        } else if (nextInLine === "Sunday") {
+          days7.push({
+            label: "Sunday",
+            price: 0
+          })
 
-            nextInLine = "Monday"
-          }
+          nextInLine = "Monday"
+        }
 
       }
 
@@ -387,8 +401,8 @@ const getStatistics = async (req, res) => {
       })
     } else {
       return res
-      .status(400)
-      .json({ message: `Details are not found for collection: ${req.params.collection_name}`, dateTime: new Date() })
+        .status(400)
+        .json({ message: `Details are not found for collection: ${req.params.collection_name}`, dateTime: new Date() })
     }
   } catch (error) {
     return res
@@ -403,9 +417,9 @@ const getTotalStatistics = async (req, res) => {
     let nftStatistics = await AhNFTSale.findAll({
       attributes: [
         'collection',
-        [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'tnx_sol_amount'], 
+        [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'tnx_sol_amount'],
         [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'tnx_usd_amount'],
-        [Sequelize.fn('min', Sequelize.col('price_floor')), 'floorSolAmount'], 
+        [Sequelize.fn('min', Sequelize.col('price_floor')), 'floorSolAmount'],
         [Sequelize.fn('min', Sequelize.col('price_floor_usd')), 'floorDollarAmount'],
         [Sequelize.fn('count', Sequelize.col('mint')), 'itemCount'],
       ],
@@ -427,10 +441,10 @@ const getTotalStatistics = async (req, res) => {
       //weekly stats data
       let nftStatistics7days = await AhNFTSale.findOne({
         attributes: [
-          [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'tnx_sol_amount'], 
+          [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'tnx_sol_amount'],
           [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'tnx_usd_amount'],
         ],
-        where: { 
+        where: {
           collection: ntfStat.collection,
           [Op.and]: [
             Sequelize.where(Sequelize.fn('date', Sequelize.col('end_date')), '>=', startDate),
@@ -443,18 +457,18 @@ const getTotalStatistics = async (req, res) => {
 
       let nft7DayValue = 0;
 
-      if(nftStatistics7days){
+      if (nftStatistics7days) {
         nft7DayValue = nftStatistics7days.tnx_sol_amount
       }
 
       //24hour stats data
       let nftStatistics24Hours = await AhNFTSale.findOne({
         attributes: [
-          [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'tnx_sol_amount'], 
+          [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'tnx_sol_amount'],
           [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'tnx_usd_amount'],
           [Sequelize.fn('count', Sequelize.col('mint')), 'itemCount']
         ],
-        where: { 
+        where: {
           collection: ntfStat.collection,
           [Op.and]: [
             Sequelize.where(Sequelize.fn('date', Sequelize.col('end_date')), '=', endDate),
@@ -468,23 +482,23 @@ const getTotalStatistics = async (req, res) => {
       let nft24HourDollarValue = 0
       let itemCount24Hours = 0;
 
-      if(nftStatistics24Hours){
+      if (nftStatistics24Hours) {
 
         itemCount24Hours = nftStatistics24Hours.itemCount !== null ? nftStatistics24Hours.itemCount : 0;
 
         nft24HourValue = nftStatistics24Hours.tnx_sol_amount !== null ? itemCount24Hours > 0 ? (nftStatistics24Hours.tnx_sol_amount / itemCount24Hours).toFixed(5) : 0 : 0;
-        nft24HourDollarValue = nftStatistics24Hours.tnx_usd_amount !== null ? itemCount24Hours > 0 ? (nftStatistics24Hours.tnx_usd_amount / itemCount24Hours).toFixed(5) : 0  : 0;
+        nft24HourDollarValue = nftStatistics24Hours.tnx_usd_amount !== null ? itemCount24Hours > 0 ? (nftStatistics24Hours.tnx_usd_amount / itemCount24Hours).toFixed(5) : 0 : 0;
       }
 
       let temp = {
-        id: i, 
-        rank: "#"+(i+1), 
-        NFTName: ntfStat.collection, 
-        itemCount: ntfStat.itemCount, 
-        image: null, 
+        id: i,
+        rank: "#" + (i + 1),
+        NFTName: ntfStat.collection,
+        itemCount: ntfStat.itemCount,
+        image: null,
         marketCap: {
           amount: ntfStat.tnx_sol_amount,
-          dollarValue: "$"+ntfStat.tnx_usd_amount
+          dollarValue: "$" + ntfStat.tnx_usd_amount
         },
         volume: {
           volumeAmount: nft7DayValue,
@@ -505,8 +519,8 @@ const getTotalStatistics = async (req, res) => {
 
       nftStates.push(temp);
 
-      
-      
+
+
     }
 
     //Statbar calculations
@@ -549,7 +563,7 @@ const getCollectionTotalVolumn = async (req, res) => {
 
     let nftTotalSales = await AhNFTSale.findOne({
       attributes: [[Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'total_sol'], [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'total_usd']],
-      where: { 
+      where: {
         collection: req.params.collection_name
       }
     })
@@ -568,15 +582,15 @@ const getCollectionTotalVolumn = async (req, res) => {
 
 
 module.exports = {
-    listNFTforSale,
-    getNFTforSale,
-    getNFTforSaleByCollection,
-    addASaleEvent,
-    getStatistics,
-    getTotalStatistics,
-    getCollectionTotalVolumn,
-    cancelListing,
-    getCollectionTotalVolumn,
-    getNFTGroupedByCollection,
-    getAllSoldActivities
-  }
+  listNFTforSale,
+  getNFTforSale,
+  getNFTforSaleByCollection,
+  addASaleEvent,
+  getStatistics,
+  getTotalStatistics,
+  getCollectionTotalVolumn,
+  cancelListing,
+  getCollectionTotalVolumn,
+  getNFTGroupedByCollection,
+  getAllSoldActivities
+}
