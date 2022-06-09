@@ -394,14 +394,14 @@ const getStatistics = async (req, res) => {
         total_usd: nftTotalSales ? nftTotalSales.total_usd != null ? nftTotalSales.total_usd : 0 : 0
       }
 
-      return res.status(400).json({
+      return res.status(200).json({
         days7,
         nftTotalSales: nftSales,
         nftActivities: nftActivities !== null ? nftActivities : [],
       })
     } else {
       return res
-        .status(400)
+        .status(200)
         .json({ message: `Details are not found for collection: ${req.params.collection_name}`, dateTime: new Date() })
     }
   } catch (error) {
