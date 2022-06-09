@@ -11,7 +11,8 @@ if (env === "Local") {
     S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
     S3_REGION: process.env.S3_REGION,
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
-    S3_BUCKET_URL: 'https://' + process.env.S3_BUCKET_NAME + '.s3.amazonaws.com'
+    S3_BUCKET_URL: 'https://' + process.env.S3_BUCKET_NAME + '.s3.amazonaws.com',
+    EMAIL_RECEIVER: process.env.LOCAL_RECEIVER_EMAIL
   }
 } else if (env === "Development") {
   config = {
@@ -23,7 +24,8 @@ if (env === "Local") {
     S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
     S3_REGION: process.env.S3_REGION,
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
-    S3_BUCKET_URL: 'https://' + process.env.S3_BUCKET_NAME + '.s3.amazonaws.com'
+    S3_BUCKET_URL: 'https://' + process.env.S3_BUCKET_NAME + '.s3.amazonaws.com',
+    EMAIL_RECEIVER: process.env.DEV_RECEIVER_EMAIL
   }
 } else if (env === "nadun") {
   config = {
@@ -35,7 +37,8 @@ if (env === "Local") {
     S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
     S3_REGION: process.env.S3_REGION,
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
-    S3_BUCKET_URL: 'https://' + process.env.S3_BUCKET_NAME + '.s3.amazonaws.com'
+    S3_BUCKET_URL: 'https://' + process.env.S3_BUCKET_NAME + '.s3.amazonaws.com',
+    EMAIL_RECEIVER: process.env.NADUN_RECEIVER_EMAIL
   }
 }else {
   config = {
@@ -47,7 +50,8 @@ if (env === "Local") {
     S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
     S3_REGION: process.env.S3_REGION,
     S3_BUCKET_NAME: process.env.S3_BUCKET_NAME,
-    S3_BUCKET_URL: 'https://' + process.env.S3_BUCKET_NAME + '.s3.amazonaws.com'
+    S3_BUCKET_URL: 'https://' + process.env.S3_BUCKET_NAME + '.s3.amazonaws.com',
+    EMAIL_RECEIVER: process.env.RECEIVER_EMAIL
   }
 }
 

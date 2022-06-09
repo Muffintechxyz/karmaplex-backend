@@ -5,6 +5,7 @@ const auctionHouse = require('./auction_house')
 const ah_NFT_sale = require('./ah_NFT_sale')
 const ah_NFT_offers = require('./ah_NFT_offers')
 const tags = require('./tags')
+const help_center = require('./help_center')
 
 module.exports = {
   launchpad_submission,
@@ -13,5 +14,6 @@ module.exports = {
   auctionHouse,
   ah_NFT_sale,
   ah_NFT_offers,
-  tags
+  tags,
+  help_center
 }
