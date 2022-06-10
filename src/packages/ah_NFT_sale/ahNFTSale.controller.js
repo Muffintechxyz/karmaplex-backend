@@ -302,108 +302,95 @@ const getStatistics = async (req, res) => {
     let nftTotalSales = await AhNFTSale.findOne({
       attributes: [[Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'total_sol'], [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'total_usd']],
       where: {
-        collection: req.params.collection_name,
-        end_date: {
-          [Op.between]: [startDate, endDate],
-        }
+        collection: req.params.collection_name
       }
     })
 
     let nftActivities = await AhNFTSale.findAll({
       attributes: [['mint', 'description'], ['tnx_usd_amount', 'price'], ['auction_house_wallet', 'fromAddress'], ['seller_wallet', 'toAddress'], ['end_date', 'time'], ['url', 'image']],
       where: {
-        collection: req.params.collection_name,
-        end_date: {
-          [Op.between]: [startDate, endDate],
-        }
+        collection: req.params.collection_name
       }
     })
 
     nftStatistics = JSON.parse(JSON.stringify(nftStatistics))
     nftTotalSales = JSON.parse(JSON.stringify(nftTotalSales))
 
-    if (nftStatistics) {
+    let days7 = [];
+    let nextInLine = "Monday";
+    for (let i = 0; i < 7; i++) {
 
-      let days7 = [];
-      let nextInLine = "Monday";
-      for (let i = 0; i < 7; i++) {
+      let currentSales = nftStatistics[i] || { end_date: null, total_cost: 0 };
+      if (nextInLine === moment(currentSales["end_date"]).format("dddd")) {
+        days7.push({
+          label: moment(currentSales["end_date"]).format("dddd"),
+          price: currentSales.total_cost
+        })
 
-        let currentSales = nftStatistics[i] || { end_date: null };
-        if (nextInLine === moment(currentSales["end_date"]).format("dddd")) {
-          days7.push({
-            label: moment(currentSales["end_date"]).format("dddd"),
-            price: currentSales.total_cost
-          })
+        nextInLine = moment(currentSales["end_date"]).add(1, "day").format("dddd")
+      } else if (nextInLine === "Monday") {
+        days7.push({
+          label: "Monday",
+          price: 0
+        })
 
-          nextInLine = moment(currentSales["end_date"]).add(1, "day").format("dddd")
-        } else if (nextInLine === "Monday") {
-          days7.push({
-            label: "Monday",
-            price: 0
-          })
+        nextInLine = "Tuesday"
+      } else if (nextInLine === "Tuesday") {
+        days7.push({
+          label: "Tuesday",
+          price: 0
+        })
 
-          nextInLine = "Tuesday"
-        } else if (nextInLine === "Tuesday") {
-          days7.push({
-            label: "Tuesday",
-            price: 0
-          })
+        nextInLine = "Wednesday"
+      } else if (nextInLine === "Wednesday") {
+        days7.push({
+          label: "Wednesday",
+          price: 0
+        })
 
-          nextInLine = "Wednesday"
-        } else if (nextInLine === "Wednesday") {
-          days7.push({
-            label: "Wednesday",
-            price: 0
-          })
+        nextInLine = "Thursday"
+      } else if (nextInLine === "Thursday") {
+        days7.push({
+          label: "Thursday",
+          price: 0
+        })
 
-          nextInLine = "Thursday"
-        } else if (nextInLine === "Thursday") {
-          days7.push({
-            label: "Thursday",
-            price: 0
-          })
+        nextInLine = "Friday"
+      } else if (nextInLine === "Friday") {
+        days7.push({
+          label: "Friday",
+          price: 0
+        })
 
-          nextInLine = "Friday"
-        } else if (nextInLine === "Friday") {
-          days7.push({
-            label: "Friday",
-            price: 0
-          })
+        nextInLine = "Saturday"
+      } else if (nextInLine === "Saturday") {
+        days7.push({
+          label: "Saturday",
+          price: 0
+        })
 
-          nextInLine = "Saturday"
-        } else if (nextInLine === "Saturday") {
-          days7.push({
-            label: "Saturday",
-            price: 0
-          })
+        nextInLine = "Sunday"
+      } else if (nextInLine === "Sunday") {
+        days7.push({
+          label: "Sunday",
+          price: 0
+        })
 
-          nextInLine = "Sunday"
-        } else if (nextInLine === "Sunday") {
-          days7.push({
-            label: "Sunday",
-            price: 0
-          })
-
-          nextInLine = "Monday"
-        }
-
+        nextInLine = "Monday"
       }
 
-      let nftSales = {
-        total_sol: nftTotalSales !== null ? nftTotalSales.total_sol != null ? nftTotalSales.total_sol : 0 : 0,
-        total_usd: nftTotalSales ? nftTotalSales.total_usd != null ? nftTotalSales.total_usd : 0 : 0
-      }
-
-      return res.status(400).json({
-        days7,
-        nftTotalSales: nftSales,
-        nftActivities: nftActivities !== null ? nftActivities : [],
-      })
-    } else {
-      return res
-        .status(400)
-        .json({ message: `Details are not found for collection: ${req.params.collection_name}`, dateTime: new Date() })
     }
+
+    let nftSales = {
+      total_sol: nftTotalSales !== null ? nftTotalSales.total_sol != null ? nftTotalSales.total_sol : 0 : 0,
+      total_usd: nftTotalSales ? nftTotalSales.total_usd != null ? nftTotalSales.total_usd : 0 : 0
+    }
+
+    return res.status(200).json({
+      days7,
+      nftTotalSales: nftSales,
+      nftActivities: nftActivities !== null ? nftActivities : [],
+    })
   } catch (error) {
     return res
       .status(400)
