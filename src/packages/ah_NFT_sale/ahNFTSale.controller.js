@@ -5,6 +5,7 @@ const AhNFTSale = require('./ahNFTSale.model')
 const uuidv4 = v4
 const { Sequelize } = require('sequelize')
 const AhNFTOffers = require('../ah_NFT_offers/ahNFToffers.model')
+const { GetAuctionHouse } = require('../auction_house_helper/GetAuctionHouse')
 const Op = Sequelize.Op;
 
 
@@ -87,7 +88,7 @@ const addASaleEvent = async (req, res) => {
     await nft.save()
 
     const offers = await AhNFTOffers.findAll({
-      where: { mint: nft.mint }
+      where: { mint: nft.min,  }
     })
 
     if (Array.isArray(offers)) {
@@ -153,18 +154,21 @@ const cancelListing = async (req, res) => {
 }
 
 const getNFTforSale = async (req, res) => {
+
+  const storeOwner = req.query?.store
+
   try {
     let NFTforSale;
     if (req.params.id) {
       NFTforSale = await AhNFTSale.findOne({
-        where: { mint: req.params.id, active: true },
+        where: { mint: req.params.id, active: true, auction_house_wallet: await GetAuctionHouse(storeOwner) },
         include: AhNFTOffers
       })
     }
     else {
       NFTforSale = await AhNFTSale.findAll({
         include: AhNFTOffers,
-        where: { active: true },
+        where: { active: true, auction_house_wallet: await GetAuctionHouse(storeOwner) },
       })
     }
 
@@ -183,12 +187,16 @@ const getNFTforSale = async (req, res) => {
 }
 
 const getAllSoldActivities = async (req, res) => {
+
+  const storeOwner = req.query?.store
   try {
     let NFTforSale;
     if (req.params.id) {
       NFTforSale = await AhNFTSale.findAll({
         where: {
-          mint: req.params.id, [Op.or]: [
+          mint: req.params.id, 
+          auction_house_wallet: await GetAuctionHouse(storeOwner),
+          [Op.or]: [
             {
               active:
               {
@@ -210,7 +218,7 @@ const getAllSoldActivities = async (req, res) => {
     else {
       NFTforSale = await AhNFTSale.findAll({
         include: AhNFTOffers,
-        where: { ahNftOfferId: { [Op.not]: null } },
+        where: { ahNftOfferId: { [Op.not]: null }, auction_house_wallet: await GetAuctionHouse(storeOwner), },
       })
     }
 
@@ -229,12 +237,15 @@ const getAllSoldActivities = async (req, res) => {
 }
 
 const getNFTforSaleByCollection = async (req, res) => {
+
+  const storeOwner = req.query?.store
+
   try {
     let NFTforSale;
     var seller = req.query?.seller;
     if (req.params.id) {
       NFTforSale = await AhNFTSale.findAll({
-        where: { collection: req.params.id, active: true },
+        where: { collection: req.params.id, active: true, auction_house_wallet: await GetAuctionHouse(storeOwner) },
         include: AhNFTOffers
       })
     }
@@ -242,6 +253,7 @@ const getNFTforSaleByCollection = async (req, res) => {
       NFTforSale = await AhNFTSale.findAll(
         {
           where: {
+            auction_house_wallet: await GetAuctionHouse(storeOwner),
             ...(!!seller && { seller_wallet: seller }),
             include: AhNFTOffers
           }
@@ -264,12 +276,15 @@ const getNFTforSaleByCollection = async (req, res) => {
 
 
 const getNFTGroupedByCollection = async (req, res) => {
+
+  const storeOwner = req.query?.store
+
   try {
     let NFTsforSale;
     NFTsforSale = await AhNFTSale.findAll(
       {
         include: AhNFTOffers,
-        where: { active: true }
+        where: { active: true, auction_house_wallet: await GetAuctionHouse(storeOwner) }
       })
     const groupedNFTs = _.groupBy(NFTsforSale, NFTsforSale => NFTsforSale.collection)
 

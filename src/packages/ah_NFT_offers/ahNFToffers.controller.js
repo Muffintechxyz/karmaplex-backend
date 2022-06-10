@@ -2,6 +2,7 @@ const moment = require('moment')
 const { v4 } = require('uuid')
 const AhNFTSale = require('../ah_NFT_sale/ahNFTSale.model')
 const AhNFTOffers = require('./ahNFToffers.model')
+const { GetAuctionHouse } = require('../auction_house_helper/GetAuctionHouse')
 
 const uuidv4 = v4
 
@@ -91,6 +92,8 @@ const cancelOffer = async (req, res) => {
 
 
 const getOffers = async (req, res) => {
+
+    const storeOwner = req.query?.store
     try {
         let NFTOffer;
         var seller = req.query?.seller;
@@ -99,6 +102,7 @@ const getOffers = async (req, res) => {
             NFTOffer = await AhNFTOffers.findAll({
                 where: { 
                     mint: req.params.id,
+                    auction_house_wallet: await GetAuctionHouse(storeOwner),
                     active: true,
                     ...(!!seller && {seller_wallet: seller}),
                     ...(!!buyer && {buyer_wallet: buyer})
@@ -110,6 +114,7 @@ const getOffers = async (req, res) => {
             NFTOffer = await AhNFTOffers.findAll({
                 where: { 
                     active: true,
+                    auction_house_wallet: await GetAuctionHouse(storeOwner),
                     ...(!!seller && {seller_wallet: seller}),
                     ...(!!buyer && {buyer_wallet: buyer})
                 },
