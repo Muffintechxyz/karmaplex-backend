@@ -3,7 +3,7 @@ const express = require('express')
 const cors = require('cors')
 const moment = require('moment')
 const database = require('./utils/DBConnection')
-const { launchpad_submission, nft_details, profile, auctionHouse, ah_NFT_sale, ah_NFT_offers, tags} = require('./packages')
+const { launchpad_submission, nft_details, profile, auctionHouse, ah_NFT_sale, ah_NFT_offers, tags, help_center} = require('./packages')
 
 
 
@@ -24,6 +24,7 @@ const main = () => {
   app.use(ah_NFT_sale())
   app.use(ah_NFT_offers())
   app.use(tags())
+  app.use(help_center())
 
   app.get('/', (req, res) => {
     res.send(`
