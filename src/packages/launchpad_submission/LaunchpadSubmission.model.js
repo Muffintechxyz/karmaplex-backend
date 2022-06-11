@@ -32,7 +32,8 @@ const LaunchpadSubmission = sequelize.define('launchpad_submissions', {
   collection_banner_url: { type: DataTypes.STRING, allowNull: false },
   approval_status: { type: DataTypes.ENUM('Pending', 'Approved'), defaultValue: 'Pending' },
   categories: { type: DataTypes.JSON, allowNull: true, defaultValue: {} },
-  featured: { type: DataTypes.BOOLEAN, allowNull: true, defaultValue: false }
+  featured: { type: DataTypes.BOOLEAN, allowNull: true, defaultValue: false },
+  store_owner_wallet: { type: DataTypes.STRING, allowNull: false }
 }, {
   paranoid: true,
   timestamps: true
