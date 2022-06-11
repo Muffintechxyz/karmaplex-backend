@@ -11,6 +11,9 @@ const s3 = new aws.S3({
 })
 
 const addSubmission = async (req, res) => {
+
+  const storeOwner = req.query?.store
+
   try {
     const userData = JSON.parse(req.body.userDetails)
     const duplicateDocs = await findDuplicate(userData.collection_name)
@@ -101,6 +104,7 @@ const addSubmission = async (req, res) => {
       collection_image_url: collectionImageURL,
       collection_banner_url: collectionBannerURL,
       featured: false,
+      store_owner_wallet: storeOwner
     }
 
     const submission = await LaunchpadSubmission.create(submissionDoc)
@@ -222,8 +226,13 @@ const updateSubmission = async (req, res) => {
 }
 
 const getSubmissions = async (req, res) => {
+
+  const storeOwner = req.query?.store
+
   try {
-    const submissions = await LaunchpadSubmission.findAll()
+    const submissions = await LaunchpadSubmission.findAll({
+      where: {store_owner_wallet: storeOwner}
+    })
 
     if (submissions.length > 0) {
       let formattedSubmissions = []
@@ -282,6 +291,9 @@ const statusToApprove = async (req, res) => {
 }
 
 const findByCollectionName = async (req, res) => {
+
+  const storeOwner = req.query?.store
+
   try {
     const collectionName = req.params.id 
     let modifiedName = collectionName
@@ -292,7 +304,7 @@ const findByCollectionName = async (req, res) => {
     }
 
     const collectionDoc = await LaunchpadSubmission.findOne({
-      where: { collection_name_query_string: modifiedName }
+      where: { collection_name_query_string: modifiedName, store_owner_wallet: storeOwner }
     })
 
     if (collectionDoc) {
@@ -318,11 +330,14 @@ const findByCollectionName = async (req, res) => {
 }
 
 const findByMint = async (req, res) => {
+
+  const storeOwner = req.query?.store
+
   try {
     const publicKey = req.params.id 
     const collectionName = req.params.collectionName
     const collectionDoc = await LaunchpadSubmission.findOne({
-      where: { creator_public_key: publicKey, collection_name: collectionName }
+      where: { creator_public_key: publicKey, collection_name: collectionName, store_owner_wallet: storeOwner }
     })
 
     if (collectionDoc) {
@@ -379,9 +394,12 @@ const makrAsFeatured = async (req, res) => {
 }
 
 const getFeaturedSubmission = async (req, res) => {
+
+  const storeOwner = req.query?.store
+
   try {
     const featuredSubmission = await LaunchpadSubmission.findOne({
-      where: { featured: true }
+      where: { featured: true, store_owner_wallet: storeOwner }
     })
 
     if (featuredSubmission) {
@@ -395,8 +413,11 @@ const getFeaturedSubmission = async (req, res) => {
 }
 
 const findDuplicate = async (collectionName) => {
+
+  const storeOwner = req.query?.store
+
   const duplicateDocs = await LaunchpadSubmission.findAll({
-    where: { collection_name: collectionName }
+    where: { collection_name: collectionName, store_owner_wallet: storeOwner }
   })
 
   if (duplicateDocs.length > 0) {
@@ -417,9 +438,10 @@ const getCollectionHeaderInfo = async (req, res) => {
     // const { creatorId, collectionName } = req.body
     const creatorId = req.params.creatorId
     const collectionName = req.params.collectionName
+    const storeOwner = req.query?.store
 
     const collectionHeaderInfo = await LaunchpadSubmission.findOne({
-      where: { creator_public_key: creatorId, collection_name: collectionName },
+      where: { creator_public_key: creatorId, collection_name: collectionName, store_owner_wallet: storeOwner },
       attributes: ['id', 'collection_name', 'project_description', 'creator_public_key', 'collection_image_url', 'collection_banner_url']
     })
 
@@ -434,12 +456,15 @@ const getCollectionHeaderInfo = async (req, res) => {
 }
 
 const getSubmission = async (req, res) => {
+
+  const storeOwner = req.query?.store
+
   try {
     const creatorId = req.params.id
     const collectionName = req.params.name
 
     const submission = await LaunchpadSubmission.findOne({
-      where: { creator_public_key: creatorId, collection_name: collectionName },
+      where: { creator_public_key: creatorId, collection_name: collectionName, store_owner_wallet: storeOwner },
     })
 
     if (submission) {

@@ -6,8 +6,10 @@ const GetAuctionHouse = async (storeOwnerWallet) => {
     })
 
     const ah = JSON.parse(JSON.stringify(auction_house))
-
-    return ah.auction_house_wallet
+    if (ah) {
+        return ah.auction_house_wallet
+    }
+    return null
 }
 
 module.exports = {
