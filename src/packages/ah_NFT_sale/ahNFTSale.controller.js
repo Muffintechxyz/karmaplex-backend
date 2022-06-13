@@ -156,19 +156,20 @@ const cancelListing = async (req, res) => {
 const getNFTforSale = async (req, res) => {
 
   const storeOwner = req.query?.store
+  const seller = req.query?.seller
 
   try {
     let NFTforSale;
     if (req.params.id) {
       NFTforSale = await AhNFTSale.findOne({
-        where: { mint: req.params.id, active: true, auction_house_wallet: await GetAuctionHouse(storeOwner) },
+        where: { mint: req.params.id, active: true, auction_house_wallet: await GetAuctionHouse(storeOwner), ...(!!seller && {seller_wallet: seller})},
         include: AhNFTOffers
       })
     }
     else {
       NFTforSale = await AhNFTSale.findAll({
         include: AhNFTOffers,
-        where: { active: true, auction_house_wallet: await GetAuctionHouse(storeOwner) },
+        where: { active: true, auction_house_wallet: await GetAuctionHouse(storeOwner), ...(!!seller && {seller_wallet: seller})},
       })
     }
 
