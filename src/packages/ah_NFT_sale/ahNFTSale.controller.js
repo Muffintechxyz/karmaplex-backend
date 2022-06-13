@@ -327,7 +327,7 @@ const getStatistics = async (req, res) => {
         where: {
           [Op.and]:[
             {collection: req.params.collection_name},
-            Sequelize.where(Sequelize.fn('date', Sequelize.col('createdAt')), '=', startDate)
+            Sequelize.where(Sequelize.fn('date', Sequelize.col('updatedAt')), '=', startDate)
           ]
           
         }
