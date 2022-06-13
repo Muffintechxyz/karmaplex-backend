@@ -310,7 +310,7 @@ const getStatistics = async (req, res) => {
     })
 
     let nftActivities = await AhNFTSale.findAll({
-      attributes: [['metadata', 'description'], ['tnx_sol_amount', 'price'], ['auction_house_wallet', 'fromAddress'], ['seller_wallet', 'toAddress'], ['end_date', 'time'], ['url', 'image']],
+      attributes: [['metadata', 'description'], ['tnx_sol_amount', 'price'], ['auction_house_wallet', 'fromAddress'], ['seller_wallet', 'toAddress'], ['updatedAt', 'time'], ['url', 'image']],
       where: {
         collection: req.params.collection_name
       }
