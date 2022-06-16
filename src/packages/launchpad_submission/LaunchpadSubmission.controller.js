@@ -314,6 +314,11 @@ const findByCollectionName = async (req, res) => {
         project_description: collectionDoc.project_description,
         collection_image_url: collectionDoc.collection_image_url,
         collection_banner_url: collectionDoc.collection_banner_url,
+        project_description: collectionDoc.project_description,
+        team_description: collectionDoc.team_description,
+        exp_mint_date: collectionDoc.exp_mint_date,
+        long_trm_goals: collectionDoc.long_trm_goals,
+        categories: collectionDoc.categories,
       }
       res.status(200).json(responseData)
     } else {

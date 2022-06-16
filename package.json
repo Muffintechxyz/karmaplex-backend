@@ -9,7 +9,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=Production node src/index.js",
     "dev:local": "cross-env NODE_ENV=Local nodemon src/index.js",
-    "dev:nadun": "cross-env NODE_ENV=nadun nodemon src/index.js",
+    "dev:nadun": "cross-env NODE_ENV=nadun AWS_PROFILE=petpos nodemon src/index.js",
     "dev": "cross-env NODE_ENV=Development nodemon src/index.js"
   },
   "dependencies": {
