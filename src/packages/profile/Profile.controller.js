@@ -22,9 +22,9 @@ const addProfileInfo = async (req, res) => {
       where: { public_key: profileInfo.public_key }
     })
 
-    let image_url;
+    let image_url = null;
     const collectionProfile = 'collection_profile'
-    if (req.files.image) {
+    if (!!req.files?.image) {
       image_url = await new Promise((resolve, reject) => {
         let key = new Date().getTime() + "_" + Math.floor(Math.random() * 1000000 + 1) + ".jpeg";
         s3.putObject({
@@ -45,15 +45,16 @@ const addProfileInfo = async (req, res) => {
     }
 
     let modfiedProfileInfo = {
-      user_name: profileInfo.user_name,
-      public_key: profileInfo.public_key,
-      email: profileInfo.email,
-      twitter_link: profileInfo.twitter_link,
-      discord_link: profileInfo.discord_link,
-      telegram: profileInfo.telegram,
-      discord_link: profileInfo.discord_link,
-      bio: profileInfo.bio,
-      image: image_url
+      ...(profileInfo.user_name && {user_name: profileInfo.user_name}),
+      ...(profileInfo.public_key && {public_key: profileInfo.public_key}),
+      ...(profileInfo.email && {email: profileInfo.email}),
+      ...(profileInfo.twitter_link && {twitter_link: profileInfo.twitter_link}),
+      ...(profileInfo.discord_link && {discord_link: profileInfo.discord_link}),
+      ...(profileInfo.telegram && {telegram: profileInfo.telegram}),
+      ...(profileInfo.discord_link && {discord_link: profileInfo.discord_link}),
+      ...(profileInfo.bio && {bio: profileInfo.bio}),
+      ...(image_url && {image: image_url}),
+      ...(profileInfo.whitelist_name && {whitelist_name: profileInfo.whitelist_name})
     }
     
     if (profile) {
@@ -74,14 +75,18 @@ const addProfileInfo = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const publicKey = req.params.id
-    if (!publicKey) {
-      throw new Error('Public key is not found')
-    }
 
-    const profile = await Profile.findOne({
-      where: { public_key: publicKey },
-      attributes: ['id', 'user_name', 'email', 'public_key', 'twitter_link', 'discord_link', 'telegram', 'bio', 'image']
-    })
+    let profile;
+    if (publicKey) {
+      profile = await Profile.findOne({
+        where: { public_key: publicKey },
+        attributes: ['id', 'user_name', 'email', 'public_key', 'twitter_link', 'discord_link', 'telegram', 'bio', 'image', 'whitelist_name']
+      })
+    } else {
+      profile = await Profile.findAll({
+        attributes: ['id', 'user_name', 'email', 'public_key', 'twitter_link', 'discord_link', 'telegram', 'bio', 'image', 'whitelist_name']
+      })
+    }
 
     if (!profile) {
       return res.status(200).json({ data: profile, datetime: new Date(), isSuccess: true })
