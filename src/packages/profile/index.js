@@ -11,5 +11,6 @@ module.exports = () => {
     ]
   ), controller.addProfileInfo)
   router.get('/profile/:id', controller.getProfile)
+  router.get('/profile', controller.getProfile)
   return router
 }

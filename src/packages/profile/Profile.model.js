@@ -11,6 +11,7 @@ const Profile = sequelize.define('profiles', {
   telegram: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
   bio: { type: DataTypes.STRING(5000), allowNull: true, defaultValue: null },
   image: { type: DataTypes.STRING, allowNull: true, defaultValue: null },
+  whitelist_name: { type: DataTypes.STRING, allowNull: true, defaultValue: null }
 }, {
   paranoid: true,
   timestamps: true
