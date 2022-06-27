@@ -71,7 +71,6 @@ const addASaleEvent = async (req, res) => {
       tnx_sol_amount,
       tnx_usd_amount,
       ahNftOfferId,
-      active,
     } = req.body
 
     const nft = await AhNFTSale.findOne({
@@ -307,14 +306,19 @@ const getStatistics = async (req, res) => {
     let nftTotalSales = await AhNFTSale.findOne({
       attributes: [[Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'total_sol'], [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'total_usd']],
       where: {
-        collection: req.params.collection_name
-      }
+          collection: req.params.collection_name,
+        }
     })
 
     let nftActivities = await AhNFTSale.findAll({
-      attributes: [['metadata', 'description'], ['tnx_sol_amount', 'price'], ['auction_house_wallet', 'fromAddress'], ['seller_wallet', 'toAddress'], ['updatedAt', 'time'], ['url', 'image']],
-      where: {
-        collection: req.params.collection_name
+      attributes: [['extendedData', 'extended'], ['metadata', 'description'], ['tnx_sol_amount', 'price'], ['auction_house_wallet', 'fromAddress'], ['seller_wallet', 'toAddress'], ['updatedAt', 'time'], ['url', 'image']],
+      where: {        
+        [Op.and]: [{
+          collection: req.params.collection_name,
+        }, {          ahNftOfferId:
+          {
+            [Op.not]: null
+          }}]
       }
     })
 
