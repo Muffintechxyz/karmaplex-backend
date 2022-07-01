@@ -387,8 +387,11 @@ const getTotalStatistics = async (req, res) => {
     let startDate = moment().subtract(6, "day").format("YYYY-MM-DD");
     let endDate = moment().format("YYYY-MM-DD");
 
+    let totalVolumnUsd = 0;
     let i = 0;
     for (const ntfStat of nftStatistics) {
+
+      totalVolumnUsd += ntfStat.tnx_usd_amount;
 
       //weekly stats data
       let nftStatistics7days = await AhNFTSale.findOne({
@@ -474,13 +477,7 @@ const getTotalStatistics = async (req, res) => {
     }
 
     //Statbar calculations
-    let statBar = await AhNFTSale.findOne({
-      attributes: [
-        [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'volumn'],
-        [Sequelize.fn('count', Sequelize.col('collection')), 'collection']
-      ],
-      raw: true,
-    });
+    let statBar = {}
 
     //get owner count
     let owners = await AhNFTSale.count({
@@ -491,9 +488,8 @@ const getTotalStatistics = async (req, res) => {
     //serialize sequelize object
     owners = JSON.parse(JSON.stringify(owners));
 
-    //serialize sequelize object
-    statBar = JSON.parse(JSON.stringify(statBar));
-
+    statBar["collection"] = nftStatistics.length;
+    statBar["volumn"] = totalVolumnUsd;
     statBar["categories"] = 4;
     statBar["owners"] = owners;
 
