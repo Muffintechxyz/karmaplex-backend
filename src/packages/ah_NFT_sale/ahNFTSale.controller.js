@@ -385,13 +385,27 @@ const getTotalStatistics = async (req, res) => {
 
     //weekly stats dates
     let startDate = moment().subtract(6, "day").format("YYYY-MM-DD");
+    let startDate14 = moment().subtract(13, "day").format("YYYY-MM-DD");
     let endDate = moment().format("YYYY-MM-DD");
 
     let totalVolumnUsd = 0;
+    let totalVolumnSol = 0;
     let i = 0;
     for (const ntfStat of nftStatistics) {
 
       totalVolumnUsd += ntfStat.tnx_usd_amount;
+      totalVolumnSol += ntfStat.tnx_sol_amount;
+
+      //single row
+      let row = await AhNFTSale.findOne({
+        attributes: ['extendedData'],
+        where: {
+          collection: ntfStat.collection
+        }
+      })
+
+      row = JSON.parse(JSON.stringify(row));
+
 
       //weekly stats data
       let nftStatistics7days = await AhNFTSale.findOne({
@@ -400,19 +414,47 @@ const getTotalStatistics = async (req, res) => {
           [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'tnx_usd_amount'],
         ],
         where: {
-          collection: ntfStat.collection
+          collection: ntfStat.collection,
+          [Op.and]: [
+            Sequelize.where(Sequelize.fn('date', Sequelize.col('updatedAt')), '>=', startDate),
+          ]
         }
       })
 
       nftStatistics7days = JSON.parse(JSON.stringify(nftStatistics7days));
-      console.log("************")
-      console.log(nftStatistics7days)
-      console.log("************")
+
+      //weekly stats data 14 days ago
+      let nftStatistics14days = await AhNFTSale.findOne({
+        attributes: [
+          [Sequelize.fn('sum', Sequelize.col('tnx_sol_amount')), 'tnx_sol_amount'],
+          [Sequelize.fn('sum', Sequelize.col('tnx_usd_amount')), 'tnx_usd_amount'],
+        ],
+        where: {
+          collection: ntfStat.collection,
+          [Op.and]: [
+            Sequelize.where(Sequelize.fn('date', Sequelize.col('updatedAt')), '>=', startDate14),
+            Sequelize.where(Sequelize.fn('date', Sequelize.col('updatedAt')), '<=', startDate)
+          ]
+        }
+      })
+
+      nftStatistics14days = JSON.parse(JSON.stringify(nftStatistics14days));
+
+      console.log("--7days--", nftStatistics7days);
+      console.log("--14days--", nftStatistics14days);
+
+
       let nft7DayValue = 0;
+      let nft14DayValue = 0;
 
       if (nftStatistics7days) {
-        nft7DayValue = nftStatistics7days.tnx_sol_amount
+        nft7DayValue = nftStatistics7days.tnx_sol_amount !== null ? nftStatistics7days.tnx_sol_amount : 0
       }
+
+      if (nftStatistics14days) {
+        nft14DayValue = nftStatistics14days.tnx_sol_amount !== null ? nftStatistics14days.tnx_sol_amount : 0
+      }
+
 
       //24hour stats data
       let nftStatistics24Hours = await AhNFTSale.findOne({
@@ -439,24 +481,25 @@ const getTotalStatistics = async (req, res) => {
 
         itemCount24Hours = nftStatistics24Hours.itemCount !== null ? nftStatistics24Hours.itemCount : 0;
 
-        nft24HourValue = nftStatistics24Hours.tnx_sol_amount !== null ? itemCount24Hours > 0 ? (nftStatistics24Hours.tnx_sol_amount / itemCount24Hours).toFixed(5) : 0 : 0;
-        nft24HourDollarValue = nftStatistics24Hours.tnx_usd_amount !== null ? itemCount24Hours > 0 ? (nftStatistics24Hours.tnx_usd_amount / itemCount24Hours).toFixed(5) : 0 : 0;
+        nft24HourValue = nftStatistics24Hours.tnx_sol_amount !== null ? itemCount24Hours > 0 ? (nftStatistics24Hours.tnx_sol_amount / itemCount24Hours).toFixed(4) : 0 : 0;
+        nft24HourDollarValue = nftStatistics24Hours.tnx_usd_amount !== null ? itemCount24Hours > 0 ? (nftStatistics24Hours.tnx_usd_amount / itemCount24Hours).toFixed(4) : 0 : 0;
       }
 
+      let petcentageIncrease = percIncrease(nft14DayValue, nft7DayValue);
       let temp = {
         id: i,
         rank: "#" + (i + 1),
         NFTName: ntfStat.collection,
         itemCount: ntfStat.itemCount,
-        image: null,
+        image: row.extendedData.image || null,
         marketCap: {
-          amount: ntfStat.tnx_sol_amount,
+          amount: ntfStat.tnx_sol_amount.toFixed(4),
           dollarValue: "$" + ntfStat.tnx_usd_amount
         },
         volume: {
-          volumeAmount: nft7DayValue,
-          volumePercentage: '',
-          isPositive: true
+          volumeAmount: nft7DayValue.toFixed(4),
+          volumePercentage: petcentageIncrease > 0 ? "+"+petcentageIncrease+"%" : petcentageIncrease+"%",
+          isPositive: petcentageIncrease > 0 ? true : false
         },
         avgPrice: {
           avgSolAmount: nft24HourValue,
@@ -490,6 +533,8 @@ const getTotalStatistics = async (req, res) => {
 
     statBar["collection"] = nftStatistics.length;
     statBar["volumn"] = totalVolumnUsd;
+    statBar["volumnSol"] = totalVolumnSol;
+  
     statBar["categories"] = 4;
     statBar["owners"] = owners;
 
@@ -523,6 +568,20 @@ const getCollectionTotalVolumn = async (req, res) => {
       .status(400)
       .json({ message: error.message, dateTime: new Date() })
   }
+}
+
+const percIncrease = (a, b) => {
+  let percent;
+  if(b !== 0) {
+      if(a !== 0) {
+          percent = (b - a) / a * 100;
+      } else {
+          percent = b * 100;
+      }
+  } else {
+      percent = - a * 100;            
+  }       
+  return Math.floor(percent);
 }
 
 
