@@ -102,7 +102,10 @@ const addASaleEvent = async (req, res) => {
       })
     }
     if (!!offers) {
-      await offers.save()
+      for (const offer of offers)
+      {
+        await offer.save()
+      }
     }
 
     if (nft) {

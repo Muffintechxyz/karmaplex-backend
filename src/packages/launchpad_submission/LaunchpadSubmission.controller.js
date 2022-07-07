@@ -30,7 +30,6 @@ const addSubmission = async (req, res) => {
 
     // Upload collection image
     if (req.files.collection_image) {
-      console.log("*************** 5")
       collectionImageURL = await new Promise((resolve, reject) => {
         let key = new Date().getTime() + "_" + Math.floor(Math.random() * 1000000 + 1) + ".jpeg";
         s3.putObject({
