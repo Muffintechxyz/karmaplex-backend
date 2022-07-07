@@ -14,9 +14,10 @@ const addSubmission = async (req, res) => {
 
   const storeOwner = req.query?.store
 
+
   try {
     const userData = JSON.parse(req.body.userDetails)
-    const duplicateDocs = await findDuplicate(userData.collection_name)
+    const duplicateDocs = await findDuplicate(userData.collection_name, storeOwner)
 
     if (!duplicateDocs.isSuccess) {
       throw new Error(duplicateDocs.message)
@@ -25,10 +26,11 @@ const addSubmission = async (req, res) => {
     let collectionImageURL;
     let collectionBannerURL;
     const collectionImage = 'collection_images'
-    const collectionBanner = 'collection_banners'
+    const collectionBanner = 'collection_banners'  
 
     // Upload collection image
     if (req.files.collection_image) {
+      console.log("*************** 5")
       collectionImageURL = await new Promise((resolve, reject) => {
         let key = new Date().getTime() + "_" + Math.floor(Math.random() * 1000000 + 1) + ".jpeg";
         s3.putObject({
@@ -412,9 +414,7 @@ const getFeaturedSubmission = async (req, res) => {
   }
 }
 
-const findDuplicate = async (collectionName) => {
-
-  const storeOwner = req.query?.store
+const findDuplicate = async (collectionName, storeOwner) => {
 
   const duplicateDocs = await LaunchpadSubmission.findAll({
     where: { collection_name: collectionName, store_owner_wallet: storeOwner }
