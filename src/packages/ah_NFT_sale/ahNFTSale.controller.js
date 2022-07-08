@@ -322,7 +322,8 @@ const getStatistics = async (req, res) => {
           {
             [Op.not]: null
           }}]
-      }
+      },
+      order: [['updatedAt', 'DESC']]
     })
 
     nftTotalSales = JSON.parse(JSON.stringify(nftTotalSales))
