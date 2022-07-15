@@ -97,7 +97,7 @@ const addASaleEvent = async (req, res) => {
     await nft.save()
 
     const offers = await AhNFTOffers.findAll({
-      where: { mint: nft.mint  }
+      where: { id: ahNftOfferId  }
     })
 
     if (Array.isArray(offers)) {
